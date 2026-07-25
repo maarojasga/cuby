@@ -15,6 +15,7 @@ import type { Recommended, Report } from "@/lib/types";
 import { riskColor } from "@/lib/ui";
 import CreditView from "./CreditView";
 import FarmerView from "./FarmerView";
+import Logo from "./Logo";
 import { Card, Pill, SectionTitle } from "./primitives";
 
 const ParcelMap = dynamic(() => import("./ParcelMap"), {
@@ -681,9 +682,7 @@ function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <a href="/" className="flex items-center gap-3.5" title="Volver al inicio">
-        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest text-2xl shadow-card">
-          🛰️
-        </div>
+        <Logo variant="icon" />
         <div>
           <h1 className="text-xl font-extrabold tracking-tight text-ink-primary">
             Cuby
