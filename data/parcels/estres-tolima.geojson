@@ -1,0 +1,37 @@
+{
+  "type": "Feature",
+  "properties": {
+    "id": "estres-tolima",
+    "name": "Lote con Estrés — Espinal",
+    "crop": "Arroz",
+    "region": "Tolima, Colombia",
+    "story": "stressed"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -74.882702,
+          4.147979
+        ],
+        [
+          -74.877298,
+          4.147979
+        ],
+        [
+          -74.877298,
+          4.152021
+        ],
+        [
+          -74.882702,
+          4.152021
+        ],
+        [
+          -74.882702,
+          4.147979
+        ]
+      ]
+    ]
+  }
+}

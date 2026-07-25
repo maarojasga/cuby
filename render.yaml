@@ -1,0 +1,23 @@
+# Blueprint de Render para el backend.
+#   1. Subí este repo a GitHub.
+#   2. En Render: New > Blueprint > apuntá a este repo.
+#   3. Render construye el Dockerfile y expone la URL pública.
+#   4. Pegá esa URL en el frontend (NEXT_PUBLIC_API_URL) al desplegar en Vercel.
+services:
+  - type: web
+    name: cuby-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: starter          # el free tier se duerme; starter mantiene el motor caliente
+    healthCheckPath: /health
+    envVars:
+      - key: CUBY_CORS_ORIGINS
+        value: "*"          # restringí al dominio de Vercel en producción
+      - key: CUBY_DEFAULT_YEARS
+        value: "3"
+      - key: CUBY_LIVE
+        value: "1"          # 1 = procesa Sentinel-2 en vivo; 0 = solo demo
+    disk:
+      name: cuby-cache
+      mountPath: /data
+      sizeGB: 5             # caché de cubos Zarr entre reinicios

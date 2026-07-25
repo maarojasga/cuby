@@ -1,0 +1,37 @@
+{
+  "type": "Feature",
+  "properties": {
+    "id": "palma-meta",
+    "name": "Palma de Aceite — San Carlos de Guaroa",
+    "crop": "Palma de aceite",
+    "region": "Meta, Colombia",
+    "story": "permanent"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -73.242701,
+          3.717305
+        ],
+        [
+          -73.237299,
+          3.717305
+        ],
+        [
+          -73.237299,
+          3.722695
+        ],
+        [
+          -73.242701,
+          3.722695
+        ],
+        [
+          -73.242701,
+          3.717305
+        ]
+      ]
+    ]
+  }
+}
