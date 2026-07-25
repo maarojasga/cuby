@@ -40,13 +40,13 @@ export default function FarmerView({ report }: { report: Report }) {
           <div
             className="flex items-center gap-3.5 rounded-xl px-4 py-3.5"
             style={{
-              background: ok ? "#2D6A4F12" : "#DC262612",
-              color: ok ? "#2D6A4F" : "#DC2626",
+              background: ok ? "#68914912" : "#DC262612",
+              color: ok ? "#689149" : "#DC2626",
             }}
           >
             <span
               className="flex h-10 w-10 items-center justify-center rounded-full text-lg text-white"
-              style={{ background: ok ? "#2D6A4F" : "#DC2626" }}
+              style={{ background: ok ? "#689149" : "#DC2626" }}
             >
               {ok ? "✓" : "!"}
             </span>

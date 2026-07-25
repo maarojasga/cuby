@@ -30,7 +30,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
   const bands: [number, number, string][] = [
     [0, 0.55, "#DC2626"],
     [0.55, 0.75, "#D97706"],
-    [0.75, 1, "#2D6A4F"],
+    [0.75, 1, "#689149"],
   ];
 
   return (
@@ -88,7 +88,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
               x={x}
               y={y + 3}
               textAnchor="middle"
-              fill="#8A8072"
+              fill="#8C857A"
               style={{ fontSize: 9 }}
             >
               {t}
@@ -100,7 +100,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
           x={CX}
           y={CY - 12}
           textAnchor="middle"
-          fill="#1C1917"
+          fill="#171009"
           style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-0.02em" }}
         >
           {value}
@@ -109,7 +109,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
           x={CX}
           y={CY + 8}
           textAnchor="middle"
-          fill="#8A8072"
+          fill="#8C857A"
           style={{ fontSize: 11 }}
         >
           de 100

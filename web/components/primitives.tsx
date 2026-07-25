@@ -66,7 +66,7 @@ export function LegendItem({ color, label }: { color: string; label: string }) {
 export function MeterBar({
   label,
   value,
-  color = "#2D6A4F",
+  color = "#689149",
 }: {
   label: string;
   value: number;
@@ -81,7 +81,7 @@ export function MeterBar({
           {Math.round(w)}
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-[#EFE6D3]">
+      <div className="h-2 overflow-hidden rounded-full bg-[#EFE9DE]">
         <div
           className="h-full rounded-full transition-[width] duration-700"
           style={{ width: `${w}%`, background: color }}
@@ -133,7 +133,7 @@ export function Pill({
 // Mini serie NDVI para las filas de parcela: forma del último par de meses.
 export function Sparkline({
   data,
-  color = "#2D6A4F",
+  color = "#689149",
   width = 72,
   height = 26,
 }: {

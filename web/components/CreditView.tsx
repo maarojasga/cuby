@@ -36,12 +36,12 @@ export default function CreditView({ report }: { report: Report }) {
           <MeterBar
             label="Productividad"
             value={score.components.productividad}
-            color="#2D6A4F"
+            color="#689149"
           />
           <MeterBar
             label="Estabilidad interanual"
             value={score.components.estabilidad}
-            color="#2A6F97"
+            color="#222D67"
           />
           <MeterBar
             label="Regularidad de ciclos"
@@ -51,7 +51,7 @@ export default function CreditView({ report }: { report: Report }) {
           <MeterBar
             label="Cobertura de datos"
             value={score.components.cobertura}
-            color="#8A8072"
+            color="#8C857A"
           />
         </div>
 
@@ -94,7 +94,7 @@ export default function CreditView({ report }: { report: Report }) {
           {Object.keys(peaks).length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {Object.entries(peaks).map(([year, v]) => (
-                <Pill key={year} color="#2D6A4F">
+                <Pill key={year} color="#689149">
                   {year} · pico {Number(v).toFixed(2)}
                 </Pill>
               ))}
@@ -108,7 +108,7 @@ export default function CreditView({ report }: { report: Report }) {
               Verificación del cultivo
             </SectionTitle>
             <div className="flex items-center gap-2">
-              <Pill color={crop.is_cultivated ? "#2D6A4F" : "#D97706"}>
+              <Pill color={crop.is_cultivated ? "#689149" : "#D97706"}>
                 {crop.is_cultivated ? "✓ Sembrado" : "⚠ Revisar"}
               </Pill>
               <span className="text-sm font-bold text-ink-primary">

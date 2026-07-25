@@ -49,18 +49,18 @@ export default function IndexChart({
             </linearGradient>
           ))}
         </defs>
-        <CartesianGrid stroke="#EFE6D3" vertical={false} strokeDasharray="0" />
+        <CartesianGrid stroke="#EFE9DE" vertical={false} strokeDasharray="0" />
         <XAxis
           dataKey="date"
           tickFormatter={fmtDateShort}
           minTickGap={48}
-          tick={{ fill: "#8A8072", fontSize: 11 }}
-          axisLine={{ stroke: "#E7DBC3" }}
+          tick={{ fill: "#8C857A", fontSize: 11 }}
+          axisLine={{ stroke: "#E6E0D2" }}
           tickLine={false}
         />
         <YAxis
           domain={domain}
-          tick={{ fill: "#8A8072", fontSize: 11 }}
+          tick={{ fill: "#8C857A", fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           width={44}
@@ -68,13 +68,13 @@ export default function IndexChart({
         <Tooltip
           contentStyle={{
             background: "#FFFFFF",
-            border: "1px solid #E7DBC3",
+            border: "1px solid #E6E0D2",
             borderRadius: 10,
             fontSize: 12,
             boxShadow: "0 6px 16px rgba(28,25,23,0.08)",
-            color: "#1C1917",
+            color: "#171009",
           }}
-          labelStyle={{ color: "#57534E" }}
+          labelStyle={{ color: "#4F4A40" }}
           labelFormatter={(d) => fmtDate(String(d))}
           formatter={(v: any, key: any) => {
             const ln = lines.find((l) => l.key === key);
