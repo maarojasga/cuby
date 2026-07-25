@@ -1,14 +1,23 @@
-# Blueprint de Render para el backend.
+# Blueprint de Render para el backend (plan FREE).
 #   1. Subí este repo a GitHub.
-#   2. En Render: New > Blueprint > apuntá a este repo.
+#   2. En Render: New > Blueprint > apuntá a este repo y elegí la rama.
 #   3. Render construye el Dockerfile y expone la URL pública.
 #   4. Pegá esa URL en el frontend (NEXT_PUBLIC_API_URL) al desplegar en Vercel.
+#
+# Notas del free tier:
+#   - El servicio se DUERME tras ~15 min sin tráfico; la primera petición
+#     después tarda ~1 min en despertar.
+#   - No admite disco persistente: la caché de cubos (CUBY_CACHE_ROOT) vive en
+#     el disco efímero y se pierde en cada reinicio. Funciona igual, solo que
+#     no reaprovecha cubos entre reinicios.
+#   - 512 MB RAM: para rangos muy largos o parcelas muy grandes puede quedarse
+#     sin memoria; bajá el rango, subí el intervalo, o pasá a `starter`.
 services:
   - type: web
     name: cuby-api
     runtime: docker
     dockerfilePath: ./Dockerfile
-    plan: starter          # el free tier se duerme; starter mantiene el motor caliente
+    plan: free
     healthCheckPath: /health
     envVars:
       - key: CUBY_CORS_ORIGINS
@@ -16,8 +25,4 @@ services:
       - key: CUBY_DEFAULT_YEARS
         value: "3"
       - key: CUBY_LIVE
-        value: "1"          # 1 = procesa Sentinel-2 en vivo; 0 = solo demo
-    disk:
-      name: cuby-cache
-      mountPath: /data
-      sizeGB: 5             # caché de cubos Zarr entre reinicios
+        value: "1"          # 1 = habilita /analyze ; 0 = lo apaga (mantenimiento)
