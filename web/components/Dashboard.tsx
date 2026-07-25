@@ -29,11 +29,15 @@ const Surface3D = dynamic(() => import("./Surface3D"), {
 
 type Mode = "credito" | "agricultor";
 
-export default function Dashboard() {
+export default function Dashboard({
+  initialMode = "credito",
+}: {
+  initialMode?: Mode;
+}) {
   const [parcels, setParcels] = useState<ParcelSummary[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [report, setReport] = useState<Report | null>(null);
-  const [mode, setMode] = useState<Mode>("credito");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [loading, setLoading] = useState(false);
   const [drawing, setDrawing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -184,7 +188,7 @@ export default function Dashboard() {
 function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-3.5">
+      <a href="/" className="flex items-center gap-3.5" title="Volver al inicio">
         <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest text-2xl shadow-card">
           🛰️
         </div>
@@ -199,7 +203,7 @@ function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
             Score de Riesgo Verde &amp; Alertas Tempranas con Sentinel-2
           </p>
         </div>
-      </div>
+      </a>
 
       <div className="inline-flex self-start rounded-full border border-line bg-card p-1 shadow-soft sm:self-auto">
         <ToggleBtn active={mode === "credito"} onClick={() => setMode("credito")}>
