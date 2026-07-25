@@ -1,0 +1,5 @@
+# Dependencias del backend HTTP (además de las de ingesta/análisis).
+# El motor geoespacial pesado vive en el requirements.txt de la raíz.
+fastapi>=0.111
+uvicorn[standard]>=0.30
+pydantic>=2.7

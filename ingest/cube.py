@@ -13,6 +13,7 @@ from .cache import DEFAULT_CACHE_ROOT, cache_key, cache_path, read_cube, write_c
 from .catalog import search_items
 from .load import load_items, to_reflectance
 from .mask import mask_clouds
+from .thin import thin_items
 
 log = logging.getLogger(__name__)
 
@@ -33,11 +34,16 @@ def get_cube(
     cache_root: Path | str = DEFAULT_CACHE_ROOT,
     refresh: bool = False,
     max_cloud_cover: float | None = None,
+    interval_days: int | None = None,
 ) -> xr.Dataset:
     """Cualquier polígono -> cubo espacio-temporal en disco, listo para leer.
 
     Devuelve un Dataset (time, y, x) con nubes ya enmascaradas, reflectancia
     en float32 y una serie `valid_fraction` por fecha.
+
+    `interval_days` muestrea las escenas ANTES de descargar: una por ventana,
+    eligiendo el día menos nublado. Para cultivos, ~15 días es un buen
+    equilibrio entre detalle y volumen.
 
     Si el cubo ya está en caché se lee y ya. Si no, se construye. Ese es el
     único condicional.
@@ -47,7 +53,8 @@ def get_cube(
         bands.append("scl")
 
     norm: AOI = normalize_aoi(aoi)
-    key = cache_key(norm, collection, start, end, bands, resolution)
+    key = cache_key(norm, collection, start, end, bands, resolution,
+                    interval_days=interval_days)
     path = cache_path(cache_root, norm.aoi_id, key)
 
     if path.exists() and not refresh:
@@ -66,6 +73,11 @@ def get_cube(
         raise NoItemsFound(
             f"Sin escenas de {collection} para {norm.aoi_id} entre {start} y {end}"
         )
+
+    n_all = len(items)
+    items = thin_items(items, interval_days)
+    if len(items) < n_all:
+        log.info("Muestreo %sd: %d de %d escenas", interval_days, len(items), n_all)
 
     ds = load_items(items, norm, bands, resolution=resolution)
     ds = to_reflectance(ds, bands)

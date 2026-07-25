@@ -1,0 +1,37 @@
+{
+  "type": "Feature",
+  "properties": {
+    "id": "cana-valle",
+    "name": "Caña de Azúcar — Valle del Cauca",
+    "crop": "Caña de azúcar",
+    "region": "Valle del Cauca, Colombia",
+    "story": "healthy"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -76.302925,
+          3.547305
+        ],
+        [
+          -76.297075,
+          3.547305
+        ],
+        [
+          -76.297075,
+          3.552695
+        ],
+        [
+          -76.302925,
+          3.552695
+        ],
+        [
+          -76.302925,
+          3.547305
+        ]
+      ]
+    ]
+  }
+}

@@ -18,7 +18,7 @@ log = logging.getLogger(__name__)
 # Subí esto cuando cambie la lógica del pipeline (máscara, escalado, groupby).
 # Es lo que te deja reprocesar sin borrar nada a mano: la clave cambia sola y
 # los cubos viejos quedan ahí, inertes, hasta que decidas limpiarlos.
-PIPELINE_VERSION = "0.2.0"
+PIPELINE_VERSION = "0.3.0"
 
 DEFAULT_CACHE_ROOT = Path("cache")
 WRITE_CHUNKS = {"time": 1, "y": 512, "x": 512}
@@ -31,6 +31,7 @@ def cache_key(
     end: str,
     bands: list[str],
     resolution: int,
+    interval_days: int | None = None,
 ) -> str:
     payload = {
         "aoi_id": aoi.aoi_id,
@@ -39,6 +40,7 @@ def cache_key(
         "end": end,
         "bands": sorted(bands),
         "resolution": resolution,
+        "interval_days": interval_days,
         "pipeline_version": PIPELINE_VERSION,
     }
     blob = json.dumps(payload, sort_keys=True, separators=(",", ":"))

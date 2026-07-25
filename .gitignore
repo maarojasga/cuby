@@ -57,3 +57,12 @@ desktop.ini
 
 # Logs
 *.log
+
+# Frontend (Next.js / Node)
+web/node_modules/
+web/.next/
+web/out/
+web/.vercel/
+web/*.tsbuildinfo
+web/next-env.d.ts
+node_modules/

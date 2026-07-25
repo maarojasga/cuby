@@ -29,8 +29,17 @@ DEFAULT_CHUNKS = {"time": 1, "y": 1024, "x": 1024}
 # (un píxel entre clase 4 y clase 8 sale clase 6). Siempre nearest.
 DEFAULT_RESAMPLING = {"scl": "nearest", "SCL": "nearest", "*": "bilinear"}
 
-# En MPC el asset STAC es `SCL`; odc.stac no acepta el alias en minúsculas.
-STAC_BAND_ALIASES = {"scl": "SCL"}
+# Nombre canónico en el cubo -> asset STAC en MPC.
+#   red/nir resuelven por common_name y se dejan pasar tal cual.
+#   rededge (B5) y swir16 (B11) se piden por asset key: sus common_names son
+#   ambiguos (hay tres red-edge) o inconsistentes entre proveedores, así que
+#   el asset directo es lo único robusto.
+#   SCL en MPC va en mayúsculas; odc.stac no acepta el alias en minúsculas.
+STAC_BAND_ALIASES = {
+    "scl": "SCL",
+    "rededge": "B05",
+    "swir16": "B11",
+}
 
 
 def _stac_bands(bands: list[str]) -> list[str]:

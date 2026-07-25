@@ -1,0 +1,37 @@
+{
+  "type": "Feature",
+  "properties": {
+    "id": "arroz-tolima",
+    "name": "Lote de Arroz — Saldaña",
+    "crop": "Arroz",
+    "region": "Tolima, Colombia (Distrito de riego)",
+    "story": "variable"
+  },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [
+          -75.023151,
+          3.927754
+        ],
+        [
+          -75.016849,
+          3.927754
+        ],
+        [
+          -75.016849,
+          3.932246
+        ],
+        [
+          -75.023151,
+          3.932246
+        ],
+        [
+          -75.023151,
+          3.927754
+        ]
+      ]
+    ]
+  }
+}
