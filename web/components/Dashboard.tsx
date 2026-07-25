@@ -17,6 +17,7 @@ import CreditView from "./CreditView";
 import FarmerView from "./FarmerView";
 import Logo from "./Logo";
 import { Card, Pill, SectionTitle } from "./primitives";
+import { ThemeToggle } from "./theme";
 
 const ParcelMap = dynamic(() => import("./ParcelMap"), {
   ssr: false,
@@ -51,11 +52,31 @@ type Selection = {
 // 15 días entre imágenes — pasadas a menos de ~2 semanas no aportan fenología.
 const DEFAULT_YEARS_BACK = 3;
 const DEFAULT_INTERVAL = 15;
+// Frecuencias recomendadas según la necesidad agronómica. El piso es 5 días:
+// la cadencia nativa de Sentinel-2. El monitoreo diario (heladas, plagas
+// fulminantes, hortalizas de ciclo corto) exige constelaciones comerciales
+// (PlanetScope/SkySat) que este producto no usa.
 const INTERVALS = [
-  { days: 5, label: "5 días — todas las pasadas", hint: "máximo detalle, descarga lenta" },
-  { days: 10, label: "10 días", hint: "detalle alto" },
-  { days: 15, label: "15 días — recomendado", hint: "equilibrio ideal para cultivos" },
-  { days: 30, label: "30 días", hint: "vista rápida, menos detalle" },
+  {
+    days: 5,
+    label: "5 días · Monitoreo activo",
+    use: "Seguimiento de NDVI/NDRE en el pico de desarrollo, fertilización de precisión y control de malezas. Cadencia nativa de Sentinel-2.",
+  },
+  {
+    days: 10,
+    label: "10 días · Seguimiento regular",
+    use: "Grano extensivo (maíz, trigo, soya, girasol) en condiciones climáticas estables.",
+  },
+  {
+    days: 15,
+    label: "15 días · Fenología e histórico (recomendado)",
+    use: "Fases lentas (siembra/emergencia, secado/maduración) y la curva del lote año a año. Buen equilibrio detalle/volumen.",
+  },
+  {
+    days: 30,
+    label: "30 días · Perennes y suelos",
+    use: "Frutales maduros, palma, viñedos en receso; mapeo de lotes y suelo desnudo.",
+  },
 ];
 
 function isoDaysAgo(days: number): string {
@@ -266,7 +287,7 @@ function SelectStage(props: {
         </div>
 
         {error && (
-          <div className="rounded-xl border border-[#DC2626]/25 bg-[#DC2626]/[0.06] px-4 py-3 text-sm text-[#F98080]">
+          <div className="rounded-xl border border-[#DC2626]/25 bg-[#DC2626]/[0.06] px-4 py-3 text-sm text-risk-alto">
             {error}
           </div>
         )}
@@ -362,21 +383,24 @@ function SelectStage(props: {
                 ))}
               </select>
             </label>
+            <p className="mt-1.5 rounded-lg bg-forest/[0.06] px-2.5 py-1.5 text-[11px] leading-relaxed text-ink-secondary">
+              {INTERVALS.find((i) => i.days === interval)?.use}
+            </p>
             <p className="mt-1.5 text-[11px] leading-relaxed text-ink-muted">
-              Sentinel-2 pasa cada ~5 días, pero para cultivos las diferencias
-              de menos de ~2 semanas no aportan. Con 3 años y 15 días el score
-              tiene el histórico que necesita.
+              Sentinel-2 pasa cada ~5 días (piso del intervalo). El monitoreo
+              diario —heladas, plagas fulminantes, hortalizas de ciclo corto—
+              requiere satélites comerciales que este producto no usa.
             </p>
 
             <button
               onClick={collect}
-              className="mt-4 w-full rounded-xl bg-forest px-4 py-3 text-sm font-bold text-cream shadow-card transition hover:bg-forest-600"
+              className="mt-4 w-full rounded-xl bg-forest px-4 py-3 text-sm font-bold text-btnink shadow-card transition hover:bg-forest-600"
             >
               🛰️ Recopilar imágenes
               {estScenes ? ` (≈ ${estScenes})` : ""}
             </button>
             {!hasLiveBackend && (
-              <p className="mt-2 text-[11px] leading-relaxed text-[#F98080]">
+              <p className="mt-2 text-[11px] leading-relaxed text-risk-alto">
                 Sin backend configurado (NEXT_PUBLIC_API_URL) la recopilación
                 no puede ejecutarse.
               </p>
@@ -437,7 +461,7 @@ function CoordsForm({
           className="rounded-lg border border-line bg-card px-2 py-1.5 text-sm text-ink-primary placeholder:text-ink-muted/60"
         />
       </div>
-      {err && <p className="mt-1.5 text-[11px] text-[#F98080]">{err}</p>}
+      {err && <p className="mt-1.5 text-[11px] text-risk-alto">{err}</p>}
       <button
         onClick={submit}
         className="mt-2 w-full rounded-lg border border-line bg-card px-3 py-1.5 text-xs font-semibold text-ink-secondary transition hover:border-forest/30 hover:text-forest"
@@ -696,16 +720,19 @@ function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
         </div>
       </a>
 
-      <div className="inline-flex self-start rounded-full border border-line bg-card p-1 shadow-soft sm:self-auto">
-        <ToggleBtn active={mode === "credito"} onClick={() => setMode("credito")}>
-          🏦 Entidad financiera
-        </ToggleBtn>
-        <ToggleBtn
-          active={mode === "agricultor"}
-          onClick={() => setMode("agricultor")}
-        >
-          🌱 Agricultor
-        </ToggleBtn>
+      <div className="flex items-center gap-3 self-start sm:self-auto">
+        <div className="inline-flex rounded-full border border-line bg-card p-1 shadow-soft">
+          <ToggleBtn active={mode === "credito"} onClick={() => setMode("credito")}>
+            🏦 Entidad financiera
+          </ToggleBtn>
+          <ToggleBtn
+            active={mode === "agricultor"}
+            onClick={() => setMode("agricultor")}
+          >
+            🌱 Agricultor
+          </ToggleBtn>
+        </div>
+        <ThemeToggle />
       </div>
     </header>
   );
@@ -725,7 +752,7 @@ function ToggleBtn({
       onClick={onClick}
       className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
         active
-          ? "bg-forest text-cream shadow-soft"
+          ? "bg-forest text-btnink shadow-soft"
           : "text-ink-muted hover:text-ink-primary"
       }`}
     >

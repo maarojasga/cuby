@@ -1,15 +1,10 @@
 "use client";
 
 import type { Alert, Report } from "@/lib/types";
-import {
-  INDEX_COLOR,
-  INDEX_HELP,
-  INDEX_LABEL,
-  fmtDate,
-  severityColor,
-} from "@/lib/ui";
+import { INDEX_HELP, INDEX_LABEL, fmtDate, severityColor } from "@/lib/ui";
 import IndexChart from "./IndexChart";
 import { Card, LegendItem, SectionTitle, Stat } from "./primitives";
+import { useIndexColors } from "./theme";
 
 const ALERT_ICON: Record<Alert["tipo"], string> = {
   estres_hidrico: "💧",
@@ -22,6 +17,7 @@ export default function FarmerView({ report }: { report: Report }) {
   const a = report.alertas;
   const last = a.ultimos_valores || {};
   const ok = a.estado === "ok";
+  const INDEX_COLOR = useIndexColors();
 
   // Últimos ~4 meses para el panel de monitoreo reciente.
   const recent = (arr: Report["series"]["ndvi"]) => arr.slice(-24);

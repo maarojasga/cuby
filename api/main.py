@@ -21,7 +21,14 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from .settings import CORS_ORIGINS, DEFAULT_YEARS, LIVE_ENABLED, PARCELS_DIR, RESOLUTION
+from .settings import (
+    CACHE_ROOT,
+    CORS_ORIGINS,
+    DEFAULT_YEARS,
+    LIVE_ENABLED,
+    PARCELS_DIR,
+    RESOLUTION,
+)
 
 log = logging.getLogger("api")
 
@@ -137,6 +144,7 @@ def analyze(req: AnalyzeRequest) -> dict:
             bands=REQUIRED_BANDS,
             resolution=RESOLUTION,
             interval_days=req.interval_days,
+            cache_root=CACHE_ROOT,  # respeta CUBY_CACHE_ROOT (volumen persistente)
         )
     except AOITooLarge as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc

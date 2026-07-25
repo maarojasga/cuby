@@ -1,43 +1,36 @@
 import type { Config } from "tailwindcss";
 
+// Los colores se leen de variables CSS (globals.css) que cambian con la clase
+// `.dark` en <html>. Así un solo toggle intercambia todo el tema en vivo.
+// Formato rgb(var(--x) / <alpha-value>) para que los modificadores /opacity
+// (bg-forest/10, border-line/40, …) sigan funcionando.
+const v = (name: string) => `rgb(var(${name}) / <alpha-value>)`;
+
 const config: Config = {
+  darkMode: "class",
   content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        // MODO OSCURO — fondo azul espacial del home; botones en blanco cálido.
-        cream: "#010a12", // fondo base (mismo azul del home). También = texto
-        //                    oscuro sobre los botones claros (text-cream).
-        card: "#0C1428", // superficie / tarjeta (navy oscuro, elevada)
-        line: {
-          DEFAULT: "#26314C", // borde sobre superficie oscura
-          soft: "#1A2338", // hairline aún más tenue (grid)
-        },
-        forest: {
-          DEFAULT: "#F9F6EE", // blanco cálido: botones / identidad / toggle
-          600: "#689149", // verde vegetación (acento / bueno)
-        },
-        ocean: "#7C8AD9", // navy aclarado — datos / agua (legible en oscuro)
-        ink: {
-          primary: "#F2EFE6", // texto claro
-          secondary: "#AEB6C2",
-          muted: "#7C8695",
-        },
-        // Índices espectrales (aclarados para leerse sobre oscuro)
-        ndvi: "#689149", // biomasa / salud (verde)
-        ndmi: "#7C8AD9", // humedad / agua (azul)
-        ndre: "#D97706", // clorofila / alerta temprana (ámbar)
-        // Estado / riesgo (ámbar y rojo reservados por significado)
-        risk: {
-          bajo: "#689149",
-          medio: "#D97706",
-          alto: "#DC2626",
-        },
+        cream: v("--page"), // fondo de pantalla
+        card: v("--card"), // superficies / tarjetas
+        line: { DEFAULT: v("--line"), soft: v("--line-soft") },
+        forest: { DEFAULT: v("--brand"), 600: v("--green") }, // identidad + verde
+        ocean: v("--data"), // datos / agua
+        ink: { primary: v("--ink"), secondary: v("--ink2"), muted: v("--ink3") },
+        // Índices espectrales
+        ndvi: v("--green"),
+        ndmi: v("--data"),
+        ndre: v("--amber"),
+        // Estado / riesgo
+        risk: { bajo: v("--green"), medio: v("--amber"), alto: v("--red") },
+        // Auxiliares de tema
+        track: v("--track"), // pistas de barras / gauge / grid
+        btnink: v("--btnink"), // texto sobre botones de marca
       },
       boxShadow: {
-        // Elevación en oscuro: sombras más marcadas sobre el fondo profundo.
-        card: "0 1px 2px rgba(0,0,0,0.45), 0 8px 24px rgba(0,0,0,0.4)",
-        soft: "0 1px 2px rgba(0,0,0,0.45)",
+        card: "var(--shadow-card)",
+        soft: "var(--shadow-soft)",
       },
       fontFamily: {
         sans: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],
