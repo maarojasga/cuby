@@ -1,3 +1,31 @@
+# Alejandra Rojas — Platanus Build Night — Bogotá @ Buk Project
+
+**Current project logo:** project-logo.png
+
+<img src="./project-logo.png" alt="Project Logo" width="200" />
+
+Hacker: Alejandra Rojas ([@maarojasga](https://github.com/maarojasga))
+
+Before submitting:
+
+- Set a project name, oneliner and description in `build-night-project.json`
+- Provide a 1000x1000 png project logo, max 500kb (`project-logo.png`)
+- Provide a concise and to the point readme
+
+### Deploying (Vercel, Render, etc.)
+
+Deploy platforms can only connect to repositories **you own**. To deploy while
+keeping commits here, mirror to a personal repo and push to both:
+
+```bash
+git remote set-url --add --push origin https://github.com/platanus-build-night/platanus-build-night-26-co-maarojasga.git
+git remote set-url --add --push origin https://github.com/<your-user>/<your-repo>.git
+```
+
+Connect Vercel/Render to your **personal** repo. Commits stay mirrored here for judging.
+
+---
+
 # 🛰️ Cuby — Score de Riesgo Verde & Alertas Tempranas
 
 Inteligencia agrícola sobre imágenes **Sentinel-2**, para dos audiencias:
