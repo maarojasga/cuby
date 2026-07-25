@@ -82,9 +82,9 @@ uvicorn api.main:app --reload
 # http://localhost:8000/parcels   ·   http://localhost:8000/docs
 ```
 
-Sin las dependencias geoespaciales pesadas, la API igual arranca y sirve los
-reportes de demostración (`api/demo/`). El procesamiento en vivo de Sentinel-2
-requiere el stack completo de `requirements.txt`.
+La recopilación de imágenes (`POST /analyze`) requiere el stack geoespacial
+completo de `requirements.txt` (odc, rasterio, dask...). Sin él, la API
+arranca, sirve `/parcels` y `/health`, y `/analyze` responde 503 explicándolo.
 
 ### Frontend
 
@@ -95,15 +95,16 @@ cp .env.example .env.local        # opcional: apuntar NEXT_PUBLIC_API_URL al bac
 npm run dev                        # http://localhost:3000
 ```
 
-Sin `NEXT_PUBLIC_API_URL`, el frontend corre en **modo demo** con los datos
-empaquetados en `web/public/demo/` — funciona solo, sin backend.
+El flujo del producto es 100% en vivo: elegir parcela (recomendada, por
+coordenadas o dibujada) → **recopilar imágenes** (rango de fechas e intervalo
+parametrizables; default 3 años cada 15 días) → panel de resultados. El
+frontend necesita `NEXT_PUBLIC_API_URL` apuntando al backend para recopilar.
 
-### Regenerar parcelas y datos de demo
+### Regenerar los lugares recomendados
 
 ```bash
 python scripts/make_parcels.py            # data/parcels/*.geojson
-PYTHONPATH=. python scripts/build_demo_reports.py   # api/demo/*.json
-cd web && npm run sync-demo                # copia api/demo -> web/public/demo
+cp data/parcels/parcels.json web/lib/parcels.json
 ```
 
 ## Desplegar
@@ -112,7 +113,7 @@ Ver **[DEPLOY.md](DEPLOY.md)** para el paso a paso. En resumen:
 
 1. **Backend → Render** (Docker, `render.yaml` incluido). Da una URL pública.
 2. **Frontend → Vercel** (root directory `web/`, `NEXT_PUBLIC_API_URL` = la URL
-   del backend). Si se deja sin backend, Vercel muestra la demo igual.
+   del backend).
 
 ## Tests
 
@@ -121,20 +122,22 @@ pip install -r requirements-dev.txt
 python -m pytest tests -q
 ```
 
-Sin red: cubren la canonicalización del AOI, el caché, los tres índices, el
-score, la verificación de cultivo, las alertas y la API (contra datos demo).
+Sin red: cubren la canonicalización del AOI, el caché, el muestreo por
+intervalo, los tres índices, el score, la verificación de cultivo, las
+alertas y la API.
 
-## Parcelas de demostración
+## Lugares recomendados
 
-Coordenadas reales sobre zonas agrícolas de Colombia (`data/parcels/`):
+Coordenadas reales sobre zonas agrícolas de Colombia (`data/parcels/`), como
+punto de partida en el mapa — el análisis siempre se hace en vivo:
 
-| Parcela | Cultivo | Región | Relato |
-|---|---|---|---|
-| Pivote Central | Maíz/Soya | Meta (Altillanura) | Sano y estable → bajo riesgo |
-| Lote de Arroz | Arroz | Tolima (Saldaña) | Campañas dispares → riesgo medio |
-| Caña de Azúcar | Caña | Valle del Cauca | Productivo → bajo riesgo |
-| Palma de Aceite | Palma | Meta | Vegetación permanente (la verificación lo marca) |
-| Lote con Estrés | Arroz | Tolima (Espinal) | Alerta activa (clorofila + hídrico) |
+| Parcela | Cultivo | Región |
+|---|---|---|
+| Pivote Central | Maíz/Soya | Meta (Altillanura) |
+| Lote de Arroz | Arroz | Tolima (Saldaña) |
+| Caña de Azúcar | Caña | Valle del Cauca |
+| Palma de Aceite | Palma | Meta |
+| Lote de Arroz | Arroz | Tolima (Espinal) |
 
 ## Detalles de la receta técnica de Sentinel-2
 
@@ -148,10 +151,10 @@ proveedor MPC) están documentadas en **[docs/INGEST.md](docs/INGEST.md)**.
 cuby/
 ├── ingest/     polígono -> cubo en disco (Sentinel-2)
 ├── analysis/   índices (NDVI/NDMI/NDRE) · score · crop · alerts · report
-├── api/        FastAPI: /parcels, /analyze, /health  (+ api/demo/ precalculado)
-├── web/        Next.js: mapa, dashboards, dibujo de parcelas (Vercel)
-├── data/       GeoJSON de parcelas
-├── scripts/    generadores de parcelas y datos de demo
+├── api/        FastAPI: /parcels (recomendados), /analyze, /health
+├── web/        Next.js: home, selección en mapa, recopilación, panel (Vercel)
+├── data/       GeoJSON de parcelas recomendadas
+├── scripts/    generador de parcelas recomendadas
 ├── tests/      sin red: aoi, cache, indices, score, alerts, api
 ├── Dockerfile  backend
 └── render.yaml despliegue del backend

@@ -5,10 +5,9 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-# Raíz del repo, para encontrar data/ y api/demo/ sin depender del cwd.
+# Raíz del repo, para encontrar data/ sin depender del cwd.
 ROOT = Path(__file__).resolve().parent.parent
 
-DEMO_DIR = ROOT / "api" / "demo"
 PARCELS_DIR = ROOT / "data" / "parcels"
 
 # Caché de cubos Zarr (lo comparte con la capa de ingesta).

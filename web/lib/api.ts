@@ -1,69 +1,96 @@
-// Cliente de la API con fallback a los datos de demo empaquetados.
+// Cliente de la API — todo el análisis es en vivo contra el backend.
 //
-// Si NEXT_PUBLIC_API_URL apunta a un backend vivo, se usa. Si no está o falla
-// (backend frío, sin red, deploy solo-frontend), se cae a /demo/*.json, que
-// viaja dentro del propio bundle de Vercel. Así el frontend nunca queda en
-// blanco: en el peor caso muestra la demo.
+// Las recomendaciones de lugares se intentan del backend y caen a la copia
+// empaquetada (mismas coordenadas reales). El análisis no tiene fallback:
+// sin backend configurado (NEXT_PUBLIC_API_URL), se explica claro.
 
-import type { ParcelSummary, Report } from "./types";
+import { RECOMMENDED } from "./recommended";
+import type { Recommended, Report } from "./types";
 
 const API = (process.env.NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+export const hasLiveBackend = Boolean(API);
 
-async function fetchJSON<T>(url: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(url, init);
-  if (!res.ok) throw new Error(`${res.status} ${res.statusText}`);
-  return res.json() as Promise<T>;
-}
+// Recopilar 3 años de imágenes puede tardar varios minutos la primera vez.
+const ANALYZE_TIMEOUT_MS = 15 * 60 * 1000;
 
-export async function getParcels(): Promise<ParcelSummary[]> {
+export async function getRecommendations(): Promise<Recommended[]> {
   if (API) {
     try {
-      return await fetchJSON<ParcelSummary[]>(`${API}/parcels`);
+      const res = await fetch(`${API}/parcels`);
+      if (res.ok) {
+        const data = (await res.json()) as Recommended[];
+        if (data.length) return data;
+      }
     } catch {
-      /* cae a demo */
+      /* cae a la copia empaquetada */
     }
   }
-  return fetchJSON<ParcelSummary[]>(`/demo/index.json`);
+  return RECOMMENDED;
 }
 
-export async function getReport(id: string): Promise<Report> {
-  if (API) {
-    try {
-      return await fetchJSON<Report>(`${API}/parcels/${id}/report`);
-    } catch {
-      /* cae a demo */
-    }
-  }
-  return fetchJSON<Report>(`/demo/${id}.json`);
-}
+export type AnalyzeOpts = {
+  name: string;
+  start: string; // YYYY-MM-DD
+  end: string; // YYYY-MM-DD
+  intervalDays: number;
+  crop?: string;
+  region?: string;
+};
 
 export type AnalyzeResult =
   | { ok: true; report: Report }
-  | { ok: false; error: string; demo?: boolean };
+  | { ok: false; error: string; noBackend?: boolean };
 
 export async function analyze(
   geojson: GeoJSON.Polygon | GeoJSON.Feature,
-  name = "Mi parcela"
+  opts: AnalyzeOpts
 ): Promise<AnalyzeResult> {
   if (!API) {
     return {
       ok: false,
-      demo: true,
+      noBackend: true,
       error:
-        "Este despliegue no tiene backend conectado. Configurá NEXT_PUBLIC_API_URL " +
-        "para analizar parcelas dibujadas; mientras tanto, explorá las parcelas de demostración.",
+        "No hay backend conectado: configurá NEXT_PUBLIC_API_URL con la URL " +
+        "de la API (ver DEPLOY.md) para recopilar imágenes de Sentinel-2.",
     };
   }
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ANALYZE_TIMEOUT_MS);
   try {
-    const report = await fetchJSON<Report>(`${API}/analyze`, {
+    const res = await fetch(`${API}/analyze`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ geojson, name }),
+      signal: controller.signal,
+      body: JSON.stringify({
+        geojson,
+        name: opts.name,
+        start: opts.start,
+        end: opts.end,
+        interval_days: opts.intervalDays,
+        crop: opts.crop,
+        region: opts.region,
+      }),
     });
-    return { ok: true, report };
+    if (!res.ok) {
+      let detail = `${res.status} ${res.statusText}`;
+      try {
+        const body = await res.json();
+        if (body?.detail) detail = String(body.detail);
+      } catch {
+        /* sin cuerpo JSON */
+      }
+      return { ok: false, error: detail };
+    }
+    return { ok: true, report: (await res.json()) as Report };
   } catch (e: any) {
-    return { ok: false, error: e?.message || "No se pudo analizar la parcela." };
+    const aborted = e?.name === "AbortError";
+    return {
+      ok: false,
+      error: aborted
+        ? "La recopilación tardó demasiado y se canceló. Probá un rango más corto o un intervalo mayor."
+        : e?.message || "No se pudo conectar con el backend.",
+    };
+  } finally {
+    clearTimeout(timer);
   }
 }
-
-export const hasLiveBackend = Boolean(API);

@@ -1,9 +1,9 @@
 # Despliegue
 
 Dos piezas independientes: el **backend** (procesamiento pesado de Sentinel-2)
-va a un host que corre Docker; el **frontend** va a Vercel. El frontend funciona
-aunque el backend no esté (modo demo), así que podés desplegarlos en cualquier
-orden.
+va a un host que corre Docker; el **frontend** va a Vercel. El producto es
+100% en vivo: el frontend necesita la URL del backend para recopilar imágenes,
+así que desplegá el backend primero.
 
 ```
 Vercel (Next.js)  ──HTTPS──▶  Render/Railway/HF Spaces (FastAPI + GDAL)
@@ -29,10 +29,10 @@ Variables de entorno (ya declaradas en `render.yaml`, ajustables en el panel):
 |---|---|---|
 | `CUBY_CORS_ORIGINS` | `*` | Restringí al dominio de Vercel en producción. |
 | `CUBY_DEFAULT_YEARS` | `3` | Años de histórico para el score. |
-| `CUBY_LIVE` | `1` | `1` procesa Sentinel-2 en vivo; `0` sirve solo demo. |
+| `CUBY_LIVE` | `1` | `1` habilita /analyze; `0` lo apaga (mantenimiento). |
 
 > El plan `starter` mantiene el motor caliente. El free tier se duerme y la
-> primera petición en vivo puede tardar; el frontend cae a demo mientras tanto.
+> primera recopilación tras el reposo puede tardar bastante más.
 
 **Alternativas:** cualquier host con Docker sirve — Railway (detecta el
 Dockerfile solo), Fly.io, o Hugging Face Spaces (SDK: Docker, puerto 8000).
@@ -58,8 +58,8 @@ curl localhost:8000/parcels
    |---|---|
    | `NEXT_PUBLIC_API_URL` | la URL del backend (ej. `https://cuby-api.onrender.com`) |
 
-   Si la dejás vacía, el sitio funciona igual en **modo demo** con los datos de
-   `web/public/demo/`.
+   Sin esta variable el sitio carga (home, mapa y recomendaciones) pero la
+   recopilación de imágenes no puede ejecutarse.
 4. **Deploy.** Vercel da la URL pública del frontend.
 
 ### Cerrar el círculo de CORS
@@ -73,13 +73,13 @@ En producción, poné `CUBY_CORS_ORIGINS` (en Render) al dominio exacto de Verce
 
 - [ ] `GET /health` del backend responde `ok`.
 - [ ] `GET /parcels` devuelve las 5 parcelas.
-- [ ] El frontend en Vercel carga y muestra las parcelas de demo.
+- [ ] El frontend en Vercel carga el mapa con los lugares recomendados.
 - [ ] Con `NEXT_PUBLIC_API_URL` seteada, dibujar una parcela dispara `/analyze`.
 - [ ] `CUBY_CORS_ORIGINS` restringido al dominio de Vercel.
 
 ## Sin backend, solo Vercel
 
-Perfectamente válido para una demo: no configures `NEXT_PUBLIC_API_URL`. El
-frontend sirve los reportes precalculados de `web/public/demo/` y todas las
-vistas (score, histórico, alertas) funcionan. Lo único que requiere backend es
-**analizar un polígono nuevo dibujado en el mapa**.
+El home, el mapa gigante y la selección de parcela funcionan (las
+recomendaciones van empaquetadas en el bundle), pero **recopilar imágenes
+requiere el backend**: el botón lo explica si `NEXT_PUBLIC_API_URL` no está
+configurada.

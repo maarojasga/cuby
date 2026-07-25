@@ -1,4 +1,4 @@
-"""La API sirve los reportes de demo sin tocar red ni dependencias pesadas."""
+"""La API sirve recomendaciones y responde con gracia sin el motor pesado."""
 
 import pytest
 
@@ -16,32 +16,38 @@ def test_health():
     assert r.json()["status"] == "ok"
 
 
-def test_parcels_trae_geometria_y_score():
+def test_parcels_son_recomendaciones_sin_analisis():
     parcels = client.get("/parcels").json()
     assert len(parcels) >= 1
     p = parcels[0]
-    assert {"id", "name", "geometry", "score", "risk_level"} <= set(p)
+    assert {"id", "name", "crop", "region", "geometry"} <= set(p)
     assert p["geometry"]["type"] == "Polygon"
+    # Sin demo: las recomendaciones no traen score ni series precalculadas.
+    assert "score" not in p
 
 
-def test_reporte_demo_completo():
-    r = client.get("/parcels/estres-tolima/report").json()
-    assert r["credito"]["score"]["risk_level"] in ("bajo", "medio", "alto")
-    assert r["alertas"]["estado"] == "alerta"
-    assert len(r["series"]["ndvi"]) > 100
-    assert r["meta"]["source"] == "demo"
-
-
-def test_parcela_desconocida_404():
-    assert client.get("/parcels/no-existe/report").status_code == 404
+def test_analyze_valida_intervalo():
+    body = {
+        "geojson": {"type": "Polygon", "coordinates": [[[0, 0], [0, 1], [1, 1], [0, 0]]]},
+        "interval_days": 2,  # < 5 no es válido
+    }
+    assert client.post("/analyze", json=body).status_code == 422
 
 
 def test_analyze_sin_motor_responde_con_gracia():
-    # Sin las deps geoespaciales instaladas, /analyze debe fallar con 503/502,
-    # nunca con un 500 sin explicación.
+    # Sin las deps geoespaciales instaladas, /analyze debe responder 503/502,
+    # nunca un 500 sin explicación. Con el motor instalado y red, 200 o 422.
     body = {
-        "geojson": {"type": "Polygon", "coordinates": [[[0, 0], [0, 1], [1, 1], [0, 0]]]},
+        "geojson": {
+            "type": "Polygon",
+            "coordinates": [[[-74.95, 4.40], [-74.94, 4.40], [-74.94, 4.41], [-74.95, 4.40]]],
+        },
         "name": "Test",
+        "start": "2024-01-01",
+        "end": "2024-02-01",
+        "interval_days": 15,
     }
     r = client.post("/analyze", json=body)
-    assert r.status_code in (200, 502, 503)
+    assert r.status_code in (200, 422, 502, 503)
+    if r.status_code != 200:
+        assert r.json()["detail"]

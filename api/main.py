@@ -1,34 +1,38 @@
-"""API del Score de Riesgo Verde y las Alertas Tempranas.
+"""API del Score de Riesgo Verde y las Alertas Tempranas — 100% Sentinel-2.
 
-    GET  /health                      ping
-    GET  /parcels                     parcelas de demo (con score y geometría)
-    GET  /parcels/{id}/report         reporte de una parcela (demo o en vivo)
-    POST /analyze                     analiza un polígono GeoJSON arbitrario
+    GET  /health     ping
+    GET  /parcels    lugares recomendados (solo coordenadas, sin análisis)
+    POST /analyze    recopila imágenes y analiza un polígono GeoJSON
 
-El procesamiento pesado de Sentinel-2 (ingesta + cubo) se hace en vivo cuando
-se puede; si las dependencias geoespaciales no están o el catálogo falla, la
-API cae con elegancia a los reportes de demo precalculados.
+El flujo del producto: el usuario elige o dibuja una parcela, define el rango
+de fechas y el intervalo entre imágenes, y /analyze construye el cubo real
+(catálogo STAC -> descarga -> máscara de nubes -> índices -> score + alertas).
 """
 
 from __future__ import annotations
 
+import json
 import logging
 from datetime import date, timedelta
+from functools import lru_cache
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import demo_store
-from .settings import CORS_ORIGINS, DEFAULT_YEARS, LIVE_ENABLED, RESOLUTION
+from .settings import CORS_ORIGINS, DEFAULT_YEARS, LIVE_ENABLED, PARCELS_DIR, RESOLUTION
 
 log = logging.getLogger("api")
+
+# Para cultivos, lecturas a menos de ~2 semanas no aportan; 15 días es un buen
+# equilibrio entre detalle fenológico y volumen de descarga.
+DEFAULT_INTERVAL_DAYS = 15
 
 app = FastAPI(
     title="Cuby — Score de Riesgo Verde & Alertas Tempranas",
     description="Análisis de parcelas con Sentinel-2 (NDVI/NDMI/NDRE).",
-    version="1.0.0",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -45,6 +49,14 @@ class AnalyzeRequest(BaseModel):
     name: str = Field("Parcela", description="Nombre legible de la parcela")
     start: str | None = Field(None, description="YYYY-MM-DD; por defecto 3 años atrás")
     end: str | None = Field(None, description="YYYY-MM-DD; por defecto hoy")
+    interval_days: int = Field(
+        DEFAULT_INTERVAL_DAYS,
+        ge=5,
+        le=60,
+        description="Días entre imágenes; 5 = todas las pasadas de Sentinel-2",
+    )
+    crop: str | None = Field(None, description="Cultivo declarado (informativo)")
+    region: str | None = Field(None, description="Región (informativo)")
 
 
 def _default_range() -> tuple[str, str]:
@@ -53,99 +65,112 @@ def _default_range() -> tuple[str, str]:
     return start.isoformat(), end.isoformat()
 
 
-def _analyze_live(geojson: dict, name: str, start: str, end: str,
-                  parcel_id: str | None = None) -> dict:
-    """Corre la tubería real: GeoJSON -> cubo -> reporte. Import perezoso.
+@lru_cache(maxsize=1)
+def _recommendations() -> list[dict]:
+    """Lugares recomendados: parcelas reales sobre zonas agrícolas conocidas.
 
-    Las dependencias geoespaciales (odc, rasterio, ...) se importan acá adentro
-    para que la API arranque y sirva demo incluso donde no estén instaladas.
+    Solo coordenadas y contexto — el análisis siempre se hace en vivo.
     """
-    from analysis import REQUIRED_BANDS, build_report
-    from ingest import get_cube
-    from ingest.aoi import AOITooLarge
-
-    try:
-        cube = get_cube(
-            geojson, start, end,
-            bands=REQUIRED_BANDS,
-            resolution=RESOLUTION,
-        )
-    except AOITooLarge as exc:
-        raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    report = build_report(cube, parcela=name, parcel_id=parcel_id,
-                          meta={"source": "sentinel-2", "start": start, "end": end})
-    return report
+    path = PARCELS_DIR / "parcels.json"
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    out = []
+    for feat in data.get("features", []):
+        p = feat.get("properties", {})
+        out.append({
+            "id": p.get("id"),
+            "name": p.get("name"),
+            "crop": p.get("crop"),
+            "region": p.get("region"),
+            "geometry": feat.get("geometry"),
+        })
+    return out
 
 
 @app.get("/health")
 def health() -> dict[str, Any]:
-    return {"status": "ok", "live_enabled": LIVE_ENABLED, "parcels": len(demo_store.index())}
+    return {
+        "status": "ok",
+        "live_enabled": LIVE_ENABLED,
+        "recomendaciones": len(_recommendations()),
+    }
 
 
 @app.get("/parcels")
 def parcels() -> list[dict]:
-    """Parcelas de demostración con su geometría y resumen de score."""
-    return demo_store.index()
-
-
-@app.get("/parcels/{parcel_id}/report")
-def parcel_report(
-    parcel_id: str,
-    live: bool = Query(False, description="Forzar procesamiento en vivo"),
-) -> dict:
-    """Reporte de una parcela de demo.
-
-    Por defecto devuelve el reporte precalculado (instantáneo). Con `?live=true`
-    reprocesa el polígono real contra Sentinel-2.
-    """
-    demo = demo_store.report(parcel_id)
-    if demo is None:
-        raise HTTPException(status_code=404, detail=f"Parcela desconocida: {parcel_id}")
-
-    if not live:
-        return demo
-
-    if not LIVE_ENABLED:
-        raise HTTPException(status_code=503, detail="El procesamiento en vivo está deshabilitado")
-
-    geometry = (demo.get("meta") or {}).get("geometry")
-    if not geometry:
-        raise HTTPException(status_code=422, detail="La parcela de demo no trae geometría para reprocesar")
-
-    start, end = _default_range()
-    try:
-        return _analyze_live(geometry, demo.get("parcela", parcel_id), start, end, parcel_id)
-    except HTTPException:
-        raise
-    except Exception as exc:  # noqa: BLE001
-        log.exception("Fallo el análisis en vivo de %s", parcel_id)
-        raise HTTPException(status_code=502, detail=f"No se pudo procesar en vivo: {exc}") from exc
+    """Lugares recomendados para empezar (geometría + contexto, sin análisis)."""
+    return _recommendations()
 
 
 @app.post("/analyze")
 def analyze(req: AnalyzeRequest) -> dict:
-    """Analiza un polígono GeoJSON arbitrario contra Sentinel-2."""
+    """Recopila las imágenes del rango pedido y analiza el polígono."""
     if not LIVE_ENABLED:
         raise HTTPException(
             status_code=503,
-            detail="El procesamiento en vivo está deshabilitado en este despliegue. "
-                   "Probá las parcelas de demostración en /parcels.",
+            detail="El procesamiento está deshabilitado en este despliegue (CUBY_LIVE=0).",
         )
 
     start = req.start or _default_range()[0]
     end = req.end or _default_range()[1]
+
     try:
-        return _analyze_live(req.geojson, req.name, start, end)
-    except HTTPException:
-        raise
+        # Import perezoso: si el motor geoespacial no está instalado, la API
+        # arranca igual y este endpoint lo dice claro.
+        from analysis import REQUIRED_BANDS, build_report
+        from ingest import get_cube
+        from ingest.aoi import AOITooLarge
+        from ingest.cube import NoItemsFound
     except ImportError as exc:
         log.exception("Faltan dependencias geoespaciales")
         raise HTTPException(
             status_code=503,
-            detail="Este despliegue no tiene el motor geoespacial instalado; "
-                   "usá las parcelas de demostración.",
+            detail="Este despliegue no tiene el motor geoespacial instalado.",
         ) from exc
+
+    try:
+        cube = get_cube(
+            req.geojson,
+            start,
+            end,
+            bands=REQUIRED_BANDS,
+            resolution=RESOLUTION,
+            interval_days=req.interval_days,
+        )
+    except AOITooLarge as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except NoItemsFound as exc:
+        raise HTTPException(
+            status_code=422,
+            detail=f"No hay escenas de Sentinel-2 para esa zona y rango: {exc}",
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
     except Exception as exc:  # noqa: BLE001
-        log.exception("Fallo el análisis de un polígono")
-        raise HTTPException(status_code=502, detail=f"No se pudo procesar: {exc}") from exc
+        log.exception("Fallo la recopilación de imágenes")
+        raise HTTPException(
+            status_code=502,
+            detail=f"No se pudieron recopilar las imágenes: {exc}",
+        ) from exc
+
+    try:
+        geometry = req.geojson.get("geometry", req.geojson) if isinstance(req.geojson, dict) else None
+        return build_report(
+            cube,
+            parcela=req.name,
+            meta={
+                "source": "sentinel-2",
+                "start": start,
+                "end": end,
+                "interval_days": req.interval_days,
+                "crop": req.crop,
+                "region": req.region,
+                "geometry": geometry,
+            },
+        )
+    except Exception as exc:  # noqa: BLE001
+        log.exception("Fallo el análisis del cubo")
+        raise HTTPException(
+            status_code=502, detail=f"No se pudo analizar el cubo: {exc}"
+        ) from exc

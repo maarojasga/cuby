@@ -62,6 +62,9 @@ export type Report = {
     region?: string;
     geometry?: GeoJSON.Polygon;
     source?: string;
+    start?: string;
+    end?: string;
+    interval_days?: number;
     [k: string]: any;
   };
   series: {
@@ -81,14 +84,11 @@ export type Report = {
   };
 };
 
-export type ParcelSummary = {
+// Lugar recomendado: solo coordenadas y contexto, el análisis es en vivo.
+export type Recommended = {
   id: string;
   name: string;
   crop: string;
   region: string;
   geometry: GeoJSON.Polygon;
-  score: number;
-  risk_level: GreenScore["risk_level"];
-  estado_alertas: "ok" | "alerta";
-  spark?: number[]; // mini-serie NDVI para el sparkline de la lista
 };
