@@ -1,0 +1,19 @@
+{
+    "type": "FeatureCollection",
+    "features": [
+      {
+        "type": "Feature",
+        "properties": { "name": "smoke-test" },
+        "geometry": {
+          "type": "Polygon",
+          "coordinates": [[
+            [-74.95, 4.40],
+            [-74.93, 4.40],
+            [-74.93, 4.42],
+            [-74.95, 4.42],
+            [-74.95, 4.40]
+          ]]
+        }
+      }
+    ]
+  }
