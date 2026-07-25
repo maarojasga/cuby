@@ -67,7 +67,7 @@ export default function Landing() {
         </div>
 
         <div className="mt-8 text-[11px] uppercase tracking-[0.18em] text-white/30">
-          Copernicus · Microsoft Planetary Computer
+          ARX
         </div>
       </div>
     </div>
