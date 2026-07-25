@@ -6,7 +6,7 @@ import type { Recommended } from "@/lib/types";
 import "leaflet/dist/leaflet.css";
 import "leaflet-draw/dist/leaflet.draw.css";
 
-const OCEAN = "#222D67"; // recomendaciones (navy)
+const OCEAN = "#7C8AD9"; // recomendaciones (navy)
 const FOREST = "#689149"; // selección / parcela activa (verde, contrasta)
 
 type Props = {

@@ -41,7 +41,7 @@ export default function CreditView({ report }: { report: Report }) {
           <MeterBar
             label="Estabilidad interanual"
             value={score.components.estabilidad}
-            color="#222D67"
+            color="#7C8AD9"
           />
           <MeterBar
             label="Regularidad de ciclos"
@@ -51,7 +51,7 @@ export default function CreditView({ report }: { report: Report }) {
           <MeterBar
             label="Cobertura de datos"
             value={score.components.cobertura}
-            color="#8C857A"
+            color="#7C8695"
           />
         </div>
 

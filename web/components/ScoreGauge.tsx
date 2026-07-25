@@ -88,7 +88,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
               x={x}
               y={y + 3}
               textAnchor="middle"
-              fill="#8C857A"
+              fill="#7C8695"
               style={{ fontSize: 9 }}
             >
               {t}
@@ -100,7 +100,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
           x={CX}
           y={CY - 12}
           textAnchor="middle"
-          fill="#171009"
+          fill="#F2EFE6"
           style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-0.02em" }}
         >
           {value}
@@ -109,7 +109,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
           x={CX}
           y={CY + 8}
           textAnchor="middle"
-          fill="#8C857A"
+          fill="#7C8695"
           style={{ fontSize: 11 }}
         >
           de 100

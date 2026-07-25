@@ -266,7 +266,7 @@ function SelectStage(props: {
         </div>
 
         {error && (
-          <div className="rounded-xl border border-[#DC2626]/25 bg-[#DC2626]/[0.06] px-4 py-3 text-sm text-[#a11d1d]">
+          <div className="rounded-xl border border-[#DC2626]/25 bg-[#DC2626]/[0.06] px-4 py-3 text-sm text-[#F98080]">
             {error}
           </div>
         )}
@@ -370,13 +370,13 @@ function SelectStage(props: {
 
             <button
               onClick={collect}
-              className="mt-4 w-full rounded-xl bg-forest px-4 py-3 text-sm font-bold text-white shadow-card transition hover:bg-forest-600"
+              className="mt-4 w-full rounded-xl bg-forest px-4 py-3 text-sm font-bold text-cream shadow-card transition hover:bg-forest-600"
             >
               🛰️ Recopilar imágenes
               {estScenes ? ` (≈ ${estScenes})` : ""}
             </button>
             {!hasLiveBackend && (
-              <p className="mt-2 text-[11px] leading-relaxed text-[#a11d1d]">
+              <p className="mt-2 text-[11px] leading-relaxed text-[#F98080]">
                 Sin backend configurado (NEXT_PUBLIC_API_URL) la recopilación
                 no puede ejecutarse.
               </p>
@@ -437,7 +437,7 @@ function CoordsForm({
           className="rounded-lg border border-line bg-card px-2 py-1.5 text-sm text-ink-primary placeholder:text-ink-muted/60"
         />
       </div>
-      {err && <p className="mt-1.5 text-[11px] text-[#a11d1d]">{err}</p>}
+      {err && <p className="mt-1.5 text-[11px] text-[#F98080]">{err}</p>}
       <button
         onClick={submit}
         className="mt-2 w-full rounded-lg border border-line bg-card px-3 py-1.5 text-xs font-semibold text-ink-secondary transition hover:border-forest/30 hover:text-forest"
@@ -725,7 +725,7 @@ function ToggleBtn({
       onClick={onClick}
       className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
         active
-          ? "bg-forest text-white shadow-soft"
+          ? "bg-forest text-cream shadow-soft"
           : "text-ink-muted hover:text-ink-primary"
       }`}
     >
