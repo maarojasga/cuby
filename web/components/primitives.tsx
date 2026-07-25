@@ -5,13 +5,16 @@ import type { ReactNode } from "react";
 export function Card({
   children,
   className = "",
+  style,
 }: {
   children: ReactNode;
   className?: string;
+  style?: React.CSSProperties;
 }) {
   return (
     <div
-      className={`rounded-2xl border border-white/[0.07] bg-surface-card p-5 ${className}`}
+      className={`rounded-2xl border border-line bg-card p-5 shadow-card ${className}`}
+      style={style}
     >
       {children}
     </div>
@@ -51,7 +54,7 @@ export function LegendItem({ color, label }: { color: string; label: string }) {
 export function MeterBar({
   label,
   value,
-  color = "#1baf7a",
+  color = "#2D6A4F",
 }: {
   label: string;
   value: number;
@@ -62,9 +65,11 @@ export function MeterBar({
     <div>
       <div className="mb-1 flex items-center justify-between text-xs">
         <span className="text-ink-secondary">{label}</span>
-        <span className="tabular-nums text-ink-primary">{Math.round(w)}</span>
+        <span className="tabular-nums font-semibold text-ink-primary">
+          {Math.round(w)}
+        </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-white/[0.06]">
+      <div className="h-2 overflow-hidden rounded-full bg-[#EFE6D3]">
         <div
           className="h-full rounded-full"
           style={{ width: `${w}%`, background: color }}
@@ -84,7 +89,7 @@ export function Stat({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5">
+    <div className="rounded-xl border border-line-soft bg-cream/60 px-3 py-2.5">
       <div className="text-[11px] uppercase tracking-wide text-ink-muted">
         {label}
       </div>
@@ -106,7 +111,7 @@ export function Pill({
   return (
     <span
       className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
-      style={{ background: `${color}22`, color }}
+      style={{ background: `${color}1a`, color }}
     >
       {children}
     </span>

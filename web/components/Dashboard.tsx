@@ -29,7 +29,6 @@ export default function Dashboard() {
   const [drawing, setDrawing] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
 
-  // Carga inicial de parcelas.
   useEffect(() => {
     getParcels()
       .then((ps) => {
@@ -39,7 +38,6 @@ export default function Dashboard() {
       .catch(() => setNotice("No se pudieron cargar las parcelas."));
   }, []);
 
-  // Cargar el reporte de la parcela seleccionada.
   useEffect(() => {
     if (!selectedId) return;
     setLoading(true);
@@ -69,13 +67,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1400px] flex-col px-4 py-4 lg:px-6">
+    <div className="mx-auto flex min-h-screen max-w-[1400px] flex-col px-4 py-5 lg:px-6">
       <Header mode={mode} setMode={setMode} />
 
-      <div className="mt-4 grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[380px_1fr]">
+      <div className="mt-5 grid flex-1 grid-cols-1 gap-5 lg:grid-cols-[380px_1fr]">
         {/* Panel izquierdo: mapa + parcelas */}
         <aside className="flex flex-col gap-4">
-          <div className="h-[300px] overflow-hidden rounded-2xl border border-white/[0.07] lg:h-[380px]">
+          <div className="h-[300px] overflow-hidden rounded-2xl border border-line bg-card shadow-card lg:h-[380px]">
             <ParcelMap
               parcels={parcels}
               selectedId={selectedId}
@@ -99,11 +97,13 @@ export default function Dashboard() {
             }}
             className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
               drawing
-                ? "border-yellow-400/40 bg-yellow-400/10 text-yellow-300"
-                : "border-white/[0.08] bg-white/[0.03] text-ink-secondary hover:bg-white/[0.06]"
+                ? "border-ocean/40 bg-ocean/10 text-ocean"
+                : "border-line bg-card text-ink-secondary shadow-soft hover:bg-cream"
             }`}
           >
-            {drawing ? "Dibujando… hacé clic en el mapa (cerrá el polígono)" : "✏️  Dibujar mi parcela"}
+            {drawing
+              ? "Dibujando… hacé clic en el mapa (cerrá el polígono)"
+              : "✏️  Dibujar mi parcela"}
           </button>
 
           <div className="flex flex-col gap-2">
@@ -127,7 +127,7 @@ export default function Dashboard() {
         {/* Panel derecho: la vista */}
         <main className="min-w-0">
           {notice && (
-            <div className="mb-4 rounded-xl border border-yellow-400/20 bg-yellow-400/[0.06] px-4 py-3 text-sm text-yellow-200">
+            <div className="mb-4 rounded-xl border border-ndre/25 bg-ndre/[0.08] px-4 py-3 text-sm text-[#92500a]">
               {notice}
             </div>
           )}
@@ -158,7 +158,7 @@ function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
   return (
     <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-ndvi/15 text-xl">
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-forest text-xl shadow-soft">
           🛰️
         </div>
         <div>
@@ -171,7 +171,7 @@ function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
         </div>
       </div>
 
-      <div className="inline-flex rounded-xl border border-white/[0.08] bg-white/[0.03] p-1">
+      <div className="inline-flex rounded-xl border border-line bg-card p-1 shadow-soft">
         <ToggleBtn active={mode === "credito"} onClick={() => setMode("credito")}>
           🏦 Entidad financiera
         </ToggleBtn>
@@ -195,10 +195,10 @@ function ToggleBtn({
   return (
     <button
       onClick={onClick}
-      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+      className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition ${
         active
-          ? "bg-ndvi/20 text-ink-primary"
-          : "text-ink-muted hover:text-ink-secondary"
+          ? "bg-forest text-white shadow-soft"
+          : "text-ink-muted hover:text-ink-primary"
       }`}
     >
       {children}
@@ -220,12 +220,12 @@ function ParcelRow({
       onClick={onClick}
       className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition ${
         active
-          ? "border-ndvi/30 bg-ndvi/[0.07]"
-          : "border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05]"
+          ? "border-forest/40 bg-forest/[0.06] shadow-soft"
+          : "border-line bg-card hover:bg-cream"
       }`}
     >
       <div className="min-w-0">
-        <div className="truncate text-sm font-medium text-ink-primary">{p.name}</div>
+        <div className="truncate text-sm font-semibold text-ink-primary">{p.name}</div>
         <div className="truncate text-xs text-ink-muted">
           {p.crop} · {p.region}
         </div>
@@ -234,7 +234,7 @@ function ParcelRow({
         {p.estado_alertas === "alerta" && <span title="Alerta activa">🔴</span>}
         <span
           className="rounded-lg px-2 py-1 text-xs font-bold tabular-nums"
-          style={{ background: `${riskColor(p.risk_level)}22`, color: riskColor(p.risk_level) }}
+          style={{ background: `${riskColor(p.risk_level)}18`, color: riskColor(p.risk_level) }}
         >
           {p.score}
         </span>
@@ -264,12 +264,10 @@ function ReportHeader({
       </div>
       <div className="flex items-center gap-2">
         {loading && <span className="text-xs text-ink-muted">actualizando…</span>}
-        <Pill color={isDemo ? "#6f7a72" : "#1baf7a"}>
+        <Pill color={isDemo ? "#8A8072" : "#2D6A4F"}>
           {isDemo ? "Datos de demostración" : "Sentinel-2 en vivo"}
         </Pill>
-        <span className="text-xs text-ink-muted">
-          {report.cobertura.n_fechas} fechas
-        </span>
+        <span className="text-xs text-ink-muted">{report.cobertura.n_fechas} fechas</span>
       </div>
     </div>
   );
@@ -277,7 +275,7 @@ function ReportHeader({
 
 function Footer() {
   return (
-    <footer className="mt-6 border-t border-white/[0.06] pt-4 text-center text-xs text-ink-muted">
+    <footer className="mt-8 border-t border-line pt-4 text-center text-xs text-ink-muted">
       Índices Sentinel-2 · NDVI (B8-B4) biomasa · NDMI (B8-B11) humedad · NDRE
       (B8-B5) clorofila · Copernicus / Microsoft Planetary Computer
     </footer>

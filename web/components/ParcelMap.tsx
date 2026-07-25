@@ -152,7 +152,7 @@ export default function ParcelMap({
 
     if (drawing && !drawControlRef.current) {
       const dc = new (L as any).Draw.Polygon(map, {
-        shapeOptions: { color: "#eda100", weight: 2 },
+        shapeOptions: { color: "#2A6F97", weight: 2 },
         allowIntersection: false,
       });
       dc.enable();

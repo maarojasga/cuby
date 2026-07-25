@@ -33,7 +33,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
         <path
           d={arcPath(0, 1)}
           fill="none"
-          stroke="#2a332e"
+          stroke="#EFE6D3"
           strokeWidth={STROKE}
           strokeLinecap="round"
         />
@@ -67,7 +67,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
 
       <div
         className="mt-1 flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-semibold"
-        style={{ background: `${color}22`, color }}
+        style={{ background: `${color}18`, color }}
       >
         <span
           className="flex h-5 w-5 items-center justify-center rounded-full text-xs font-bold text-black"

@@ -24,10 +24,10 @@ export default function CreditView({ report }: { report: Report }) {
         <ScoreGauge score={score} />
 
         <div className="mt-5 space-y-3">
-          <MeterBar label="Productividad" value={score.components.productividad} color="#1baf7a" />
-          <MeterBar label="Estabilidad interanual" value={score.components.estabilidad} color="#3987e5" />
-          <MeterBar label="Regularidad de ciclos" value={score.components.regularidad} color="#eda100" />
-          <MeterBar label="Cobertura de datos" value={score.components.cobertura} color="#6f7a72" />
+          <MeterBar label="Productividad" value={score.components.productividad} color="#2D6A4F" />
+          <MeterBar label="Estabilidad interanual" value={score.components.estabilidad} color="#2A6F97" />
+          <MeterBar label="Regularidad de ciclos" value={score.components.regularidad} color="#D97706" />
+          <MeterBar label="Cobertura de datos" value={score.components.cobertura} color="#8A8072" />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-2">
@@ -61,7 +61,7 @@ export default function CreditView({ report }: { report: Report }) {
           {Object.keys(peaks).length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {Object.entries(peaks).map(([year, v]) => (
-                <Pill key={year} color="#1baf7a">
+                <Pill key={year} color="#2D6A4F">
                   {year}: pico {Number(v).toFixed(2)}
                 </Pill>
               ))}
@@ -73,7 +73,7 @@ export default function CreditView({ report }: { report: Report }) {
           <Card>
             <SectionTitle>Verificación del cultivo</SectionTitle>
             <div className="flex items-center gap-2">
-              <Pill color={crop.is_cultivated ? "#0ca30c" : "#fab219"}>
+              <Pill color={crop.is_cultivated ? "#2D6A4F" : "#D97706"}>
                 {crop.is_cultivated ? "✓ Sembrado" : "⚠ Revisar"}
               </Pill>
               <span className="text-sm font-medium text-ink-primary">{crop.label}</span>

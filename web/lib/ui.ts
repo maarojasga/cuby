@@ -3,9 +3,9 @@
 import type { GreenScore } from "./types";
 
 export const INDEX_COLOR = {
-  ndvi: "#1baf7a", // biomasa
-  ndmi: "#3987e5", // humedad
-  ndre: "#eb6834", // clorofila
+  ndvi: "#2D6A4F", // biomasa / salud (verde vegetación)
+  ndmi: "#2A6F97", // humedad / agua (azul petróleo)
+  ndre: "#D97706", // clorofila / alerta temprana (ámbar)
 } as const;
 
 export const INDEX_LABEL = {
@@ -25,13 +25,13 @@ export type RiskLevel = GreenScore["risk_level"];
 export function riskColor(level: RiskLevel): string {
   switch (level) {
     case "bajo":
-      return "#0ca30c";
+      return "#2D6A4F"; // verde vegetación
     case "medio":
-      return "#fab219";
+      return "#D97706"; // ámbar cálido
     case "alto":
-      return "#d03b3b";
+      return "#DC2626"; // rojo carmesí
     default:
-      return "#6f7a72";
+      return "#8A8072";
   }
 }
 
@@ -49,7 +49,7 @@ export function riskIcon(level: RiskLevel): string {
 }
 
 export function severityColor(sev: "media" | "alta"): string {
-  return sev === "alta" ? "#d03b3b" : "#fab219";
+  return sev === "alta" ? "#DC2626" : "#D97706";
 }
 
 export function fmtDate(iso: string): string {

@@ -38,8 +38,8 @@ export default function FarmerView({ report }: { report: Report }) {
           <div
             className="flex items-center gap-3 rounded-xl px-4 py-3"
             style={{
-              background: ok ? "#0ca30c18" : "#d03b3b18",
-              color: ok ? "#0ca30c" : "#d03b3b",
+              background: ok ? "#2D6A4F15" : "#DC262615",
+              color: ok ? "#2D6A4F" : "#DC2626",
             }}
           >
             <span className="text-2xl">{ok ? "✓" : "⚠"}</span>
@@ -63,11 +63,12 @@ export default function FarmerView({ report }: { report: Report }) {
         </Card>
 
         {a.alertas.map((al, i) => (
-          <Card key={i} className="border-l-4" >
-            <div
-              className="flex items-start gap-3"
-              style={{ borderColor: severityColor(al.severidad) }}
-            >
+          <Card
+            key={i}
+            className="border-l-4"
+            style={{ borderLeftColor: severityColor(al.severidad) }}
+          >
+            <div className="flex items-start gap-3">
               <span className="text-2xl leading-none">{ALERT_ICON[al.tipo]}</span>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
