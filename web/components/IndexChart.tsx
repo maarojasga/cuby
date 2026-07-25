@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import type { SeriesPoint } from "@/lib/types";
 import { fmtDate, fmtDateShort } from "@/lib/ui";
+import { chartTheme, useIsDark } from "./theme";
 
 type Line = { key: string; label: string; color: string; data: SeriesPoint[] };
 
@@ -25,6 +26,8 @@ export default function IndexChart({
   domain?: [number, number];
   height?: number;
 }) {
+  const t = chartTheme(useIsDark());
+
   // Unir por fecha para un tooltip compartido.
   const byDate = new Map<string, any>();
   lines.forEach((ln) =>
@@ -49,32 +52,32 @@ export default function IndexChart({
             </linearGradient>
           ))}
         </defs>
-        <CartesianGrid stroke="#202A44" vertical={false} strokeDasharray="0" />
+        <CartesianGrid stroke={t.grid} vertical={false} strokeDasharray="0" />
         <XAxis
           dataKey="date"
           tickFormatter={fmtDateShort}
           minTickGap={48}
-          tick={{ fill: "#7C8695", fontSize: 11 }}
-          axisLine={{ stroke: "#26314C" }}
+          tick={{ fill: t.axis, fontSize: 11 }}
+          axisLine={{ stroke: t.axisLine }}
           tickLine={false}
         />
         <YAxis
           domain={domain}
-          tick={{ fill: "#7C8695", fontSize: 11 }}
+          tick={{ fill: t.axis, fontSize: 11 }}
           axisLine={false}
           tickLine={false}
           width={44}
         />
         <Tooltip
           contentStyle={{
-            background: "#0C1428",
-            border: "1px solid #26314C",
+            background: t.tooltipBg,
+            border: `1px solid ${t.tooltipBorder}`,
             borderRadius: 10,
             fontSize: 12,
-            boxShadow: "0 8px 24px rgba(0,0,0,0.5)",
-            color: "#F2EFE6",
+            boxShadow: t.tooltipShadow,
+            color: t.ink,
           }}
-          labelStyle={{ color: "#AEB6C2" }}
+          labelStyle={{ color: t.ink2 }}
           labelFormatter={(d) => fmtDate(String(d))}
           formatter={(v: any, key: any) => {
             const ln = lines.find((l) => l.key === key);

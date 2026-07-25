@@ -2,16 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Tokens de tema (canales RGB para poder aplicarles opacidad) ── */
 :root {
+  color-scheme: light;
+  --page: 249 246 238; /* #F9F6EE */
+  --card: 255 255 255;
+  --line: 230 224 210; /* #E6E0D2 */
+  --line-soft: 241 236 224; /* #F1ECE0 */
+  --brand: 34 45 103; /* #222D67 navy (botones/identidad en claro) */
+  --green: 104 145 73; /* #689149 */
+  --data: 34 45 103; /* #222D67 (agua/NDMI en claro) */
+  --ink: 23 16 9; /* #171009 */
+  --ink2: 79 74 64; /* #4F4A40 */
+  --ink3: 140 133 122; /* #8C857A */
+  --track: 239 233 222; /* #EFE9DE */
+  --btnink: 255 255 255; /* texto sobre botón de marca (navy) */
+  --amber: 217 119 6; /* #D97706 */
+  --red: 220 38 38; /* #DC2626 */
+  --shadow-card: 0 1px 2px rgba(18, 5, 0, 0.05), 0 6px 16px rgba(18, 5, 0, 0.06);
+  --shadow-soft: 0 1px 2px rgba(18, 5, 0, 0.05);
+  --map-bg: #ece6d9;
+}
+
+.dark {
   color-scheme: dark;
+  --page: 1 10 18; /* #010a12 azul del home */
+  --card: 12 20 40; /* #0C1428 */
+  --line: 38 49 76; /* #26314C */
+  --line-soft: 26 35 56; /* #1A2338 */
+  --brand: 249 246 238; /* #F9F6EE blanco cálido (botones/identidad) */
+  --green: 104 145 73;
+  --data: 124 138 217; /* #7C8AD9 azul aclarado */
+  --ink: 242 239 230; /* #F2EFE6 */
+  --ink2: 174 182 194; /* #AEB6C2 */
+  --ink3: 124 134 149; /* #7C8695 */
+  --track: 32 42 68; /* #202A44 */
+  --btnink: 1 10 18; /* texto sobre botón de marca (off-white) */
+  --amber: 217 119 6;
+  --red: 220 38 38;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.45), 0 8px 24px rgba(0, 0, 0, 0.4);
+  --shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --map-bg: #08111d;
 }
 
 html,
 body {
+  background: linear-gradient(180deg, #fcfaf3 0%, #f9f6ee 320px);
+  background-color: #f9f6ee;
+  color: rgb(var(--ink));
+  -webkit-font-smoothing: antialiased;
+}
+.dark body {
   background: linear-gradient(180deg, #04121d 0%, #010a12 360px);
   background-color: #010a12;
-  color: #f2efe6;
-  -webkit-font-smoothing: antialiased;
 }
 
 /* Slider temporal del relieve 3D */
@@ -21,59 +64,73 @@ input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   width: 16px;
   border-radius: 9999px;
-  background: #f9f6ee;
-  border: 2px solid #010a12;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  background: #222d67;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(18, 5, 0, 0.28);
   cursor: pointer;
 }
 input[type="range"]::-moz-range-thumb {
   height: 16px;
   width: 16px;
   border-radius: 9999px;
-  background: #f9f6ee;
-  border: 2px solid #010a12;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  background: #222d67;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(18, 5, 0, 0.28);
   cursor: pointer;
 }
+.dark input[type="range"]::-webkit-slider-thumb {
+  background: #f9f6ee;
+  border-color: #010a12;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+.dark input[type="range"]::-moz-range-thumb {
+  background: #f9f6ee;
+  border-color: #010a12;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
 
-/* Leaflet: fondo del contenedor y tipografía del sistema */
+/* Leaflet */
 .leaflet-container {
-  background: #08111d;
+  background: var(--map-bg);
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-
-/* Controles de Leaflet acordes al tema oscuro */
 .leaflet-bar a,
 .leaflet-draw-toolbar a {
-  background-color: #0c1428 !important;
-  color: #f2efe6 !important;
-  border-color: #26314c !important;
+  background-color: rgb(var(--card)) !important;
+  color: rgb(var(--ink)) !important;
+  border-color: rgb(var(--line)) !important;
 }
 .leaflet-bar a:hover {
-  background-color: #16203a !important;
+  background-color: rgb(var(--page)) !important;
 }
 .leaflet-tooltip {
-  background: #0c1428;
-  border: 1px solid #26314c;
-  color: #f2efe6;
+  background: rgb(var(--card));
+  border: 1px solid rgb(var(--line));
+  color: rgb(var(--ink));
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--shadow-soft);
   font-weight: 500;
 }
 .leaflet-tooltip-top::before {
-  border-top-color: #26314c;
+  border-top-color: rgb(var(--line));
 }
 
-/* Scrollbar oscuro y sutil */
+/* Scrollbar */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #1f2942;
+  background: #e2dccc;
   border-radius: 6px;
 }
+.dark ::-webkit-scrollbar-thumb {
+  background: #1f2942;
+}
 ::-webkit-scrollbar-thumb:hover {
+  background: #d4ccb8;
+}
+.dark ::-webkit-scrollbar-thumb:hover {
   background: #2b385a;
 }
 ::-webkit-scrollbar-track {

@@ -81,7 +81,7 @@ export function MeterBar({
           {Math.round(w)}
         </span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-[#202A44]">
+      <div className="h-2 overflow-hidden rounded-full bg-track">
         <div
           className="h-full rounded-full transition-[width] duration-700"
           style={{ width: `${w}%`, background: color }}

@@ -12,6 +12,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls.js";
 import type { SurfaceData } from "@/lib/types";
 import { fmtDate } from "@/lib/ui";
+import { chartTheme, useIsDark } from "./theme";
 
 const HEIGHT = 0.95; // altura del relieve para NDVI = 1
 const FRAME_MS = 850; // cadencia de la animación temporal
@@ -110,6 +111,7 @@ export default function Surface3D({
   const [frame, setFrame] = useState(0);
   const [playing, setPlaying] = useState(true);
   const targetRef = useRef<Float32Array | null>(null);
+  const dark = useIsDark();
 
   // Frames orientados: fila 0 = norte, siempre.
   const frames = useMemo(
@@ -212,10 +214,10 @@ export default function Surface3D({
     const mesh = new THREE.Mesh(geo, mat);
     scene.add(mesh);
 
-    // Pedestal: una placa oscura con el contorno del bbox, para asentarlo.
+    // Pedestal: una placa con el contorno del bbox, para asentarlo.
     const base = new THREE.Mesh(
       new THREE.BoxGeometry(W + 0.25, 0.06, D + 0.25),
-      new THREE.MeshStandardMaterial({ color: 0x111a30, roughness: 1 })
+      new THREE.MeshStandardMaterial({ color: chartTheme(dark).pedestal, roughness: 1 })
     );
     base.position.y = -0.05;
     scene.add(base);
@@ -306,7 +308,7 @@ export default function Surface3D({
       delete (mount as any).__setTarget;
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [frames, height, nFrames]);
+  }, [frames, height, nFrames, dark]);
 
   // Cambio de frame -> nuevo objetivo de interpolación.
   useEffect(() => {
@@ -345,7 +347,7 @@ export default function Surface3D({
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           onClick={() => setPlaying((p) => !p)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-forest text-sm text-cream shadow-soft transition hover:bg-forest-600"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-forest text-sm text-btnink shadow-soft transition hover:bg-forest-600"
           aria-label={playing ? "Pausar" : "Reproducir"}
         >
           {playing ? "❚❚" : "▶"}

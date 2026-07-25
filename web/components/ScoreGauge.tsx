@@ -2,6 +2,7 @@
 
 import type { GreenScore } from "@/lib/types";
 import { riskColor, riskIcon } from "@/lib/ui";
+import { chartTheme, useIsDark } from "./theme";
 
 // Gauge semicircular con las tres bandas de riesgo pintadas en la pista
 // (alto < 55 ≤ medio < 75 ≤ bajo) y el arco del valor encima. Ícono +
@@ -9,6 +10,7 @@ import { riskColor, riskIcon } from "@/lib/ui";
 export default function ScoreGauge({ score }: { score: GreenScore }) {
   const value = Math.max(0, Math.min(100, score.score));
   const color = riskColor(score.risk_level);
+  const ct = chartTheme(useIsDark());
 
   const R = 82;
   const CX = 100;
@@ -67,7 +69,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
               y1={y1}
               x2={x2}
               y2={y2}
-              stroke="#FFFFFF"
+              stroke={ct.tooltipBg}
               strokeWidth={2}
             />
           );
@@ -88,7 +90,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
               x={x}
               y={y + 3}
               textAnchor="middle"
-              fill="#7C8695"
+              fill={ct.axis}
               style={{ fontSize: 9 }}
             >
               {t}
@@ -100,7 +102,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
           x={CX}
           y={CY - 12}
           textAnchor="middle"
-          fill="#F2EFE6"
+          fill={ct.ink}
           style={{ fontSize: 42, fontWeight: 800, letterSpacing: "-0.02em" }}
         >
           {value}
@@ -109,7 +111,7 @@ export default function ScoreGauge({ score }: { score: GreenScore }) {
           x={CX}
           y={CY + 8}
           textAnchor="middle"
-          fill="#7C8695"
+          fill={ct.axis}
           style={{ fontSize: 11 }}
         >
           de 100

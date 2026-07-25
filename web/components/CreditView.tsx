@@ -1,9 +1,10 @@
 "use client";
 
 import type { Report } from "@/lib/types";
-import { INDEX_COLOR, INDEX_LABEL, pct, riskColor } from "@/lib/ui";
+import { INDEX_LABEL, pct, riskColor } from "@/lib/ui";
 import IndexChart from "./IndexChart";
 import ScoreGauge from "./ScoreGauge";
+import { useIndexColors } from "./theme";
 import {
   Card,
   LegendItem,
@@ -18,6 +19,7 @@ export default function CreditView({ report }: { report: Report }) {
   const { score, verificacion_cultivo: crop } = report.credito;
   const m = score.metrics;
   const color = riskColor(score.risk_level);
+  const idx = useIndexColors();
   const peaks: Record<string, number> = m.picos_por_anio || {};
 
   return (
@@ -41,7 +43,7 @@ export default function CreditView({ report }: { report: Report }) {
           <MeterBar
             label="Estabilidad interanual"
             value={score.components.estabilidad}
-            color="#7C8AD9"
+            color={idx.ndmi}
           />
           <MeterBar
             label="Regularidad de ciclos"
@@ -77,14 +79,14 @@ export default function CreditView({ report }: { report: Report }) {
             >
               Historial de producción
             </SectionTitle>
-            <LegendItem color={INDEX_COLOR.ndvi} label={INDEX_LABEL.ndvi} />
+            <LegendItem color={idx.ndvi} label={INDEX_LABEL.ndvi} />
           </div>
           <IndexChart
             lines={[
               {
                 key: "ndvi",
                 label: "NDVI",
-                color: INDEX_COLOR.ndvi,
+                color: idx.ndvi,
                 data: report.series.ndvi,
               },
             ]}
