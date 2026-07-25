@@ -5,26 +5,27 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Paleta: navy + verde sobre blanco cálido
-        cream: "#F9F6EE", // fondo base (pantalla)
-        card: "#FFFFFF", // superficies / tarjetas
+        // MODO OSCURO — fondo azul espacial del home; botones en blanco cálido.
+        cream: "#010a12", // fondo base (mismo azul del home). También = texto
+        //                    oscuro sobre los botones claros (text-cream).
+        card: "#0C1428", // superficie / tarjeta (navy oscuro, elevada)
         line: {
-          DEFAULT: "#E6E0D2", // borde suave
-          soft: "#F1ECE0", // hairline aún más tenue (grid)
+          DEFAULT: "#26314C", // borde sobre superficie oscura
+          soft: "#1A2338", // hairline aún más tenue (grid)
         },
         forest: {
-          DEFAULT: "#222D67", // navy profundo (identidad / acciones)
+          DEFAULT: "#F9F6EE", // blanco cálido: botones / identidad / toggle
           600: "#689149", // verde vegetación (acento / bueno)
         },
-        ocean: "#222D67", // navy — datos / agua
+        ocean: "#7C8AD9", // navy aclarado — datos / agua (legible en oscuro)
         ink: {
-          primary: "#171009", // neutro cálido muy oscuro
-          secondary: "#4F4A40",
-          muted: "#8C857A",
+          primary: "#F2EFE6", // texto claro
+          secondary: "#AEB6C2",
+          muted: "#7C8695",
         },
-        // Índices espectrales
+        // Índices espectrales (aclarados para leerse sobre oscuro)
         ndvi: "#689149", // biomasa / salud (verde)
-        ndmi: "#222D67", // humedad / agua (navy)
+        ndmi: "#7C8AD9", // humedad / agua (azul)
         ndre: "#D97706", // clorofila / alerta temprana (ámbar)
         // Estado / riesgo (ámbar y rojo reservados por significado)
         risk: {
@@ -34,9 +35,9 @@ const config: Config = {
         },
       },
       boxShadow: {
-        // Elevación limpia sin sombras pesadas (tono cálido de la paleta)
-        card: "0 1px 2px rgba(18,5,0,0.05), 0 6px 16px rgba(18,5,0,0.06)",
-        soft: "0 1px 2px rgba(18,5,0,0.05)",
+        // Elevación en oscuro: sombras más marcadas sobre el fondo profundo.
+        card: "0 1px 2px rgba(0,0,0,0.45), 0 8px 24px rgba(0,0,0,0.4)",
+        soft: "0 1px 2px rgba(0,0,0,0.45)",
       },
       fontFamily: {
         sans: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],

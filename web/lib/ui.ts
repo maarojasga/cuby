@@ -4,7 +4,7 @@ import type { GreenScore } from "./types";
 
 export const INDEX_COLOR = {
   ndvi: "#689149", // biomasa / salud (verde vegetación)
-  ndmi: "#222D67", // humedad / agua (azul petróleo)
+  ndmi: "#7C8AD9", // humedad / agua (azul petróleo)
   ndre: "#D97706", // clorofila / alerta temprana (ámbar)
 } as const;
 
@@ -31,7 +31,7 @@ export function riskColor(level: RiskLevel): string {
     case "alto":
       return "#DC2626"; // rojo carmesí
     default:
-      return "#8C857A";
+      return "#7C8695";
   }
 }
 

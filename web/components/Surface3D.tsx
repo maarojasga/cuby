@@ -212,10 +212,10 @@ export default function Surface3D({
     const mesh = new THREE.Mesh(geo, mat);
     scene.add(mesh);
 
-    // Pedestal: una placa crema con el contorno del bbox, para asentarlo.
+    // Pedestal: una placa oscura con el contorno del bbox, para asentarlo.
     const base = new THREE.Mesh(
       new THREE.BoxGeometry(W + 0.25, 0.06, D + 0.25),
-      new THREE.MeshStandardMaterial({ color: 0xede7d8, roughness: 1 })
+      new THREE.MeshStandardMaterial({ color: 0x111a30, roughness: 1 })
     );
     base.position.y = -0.05;
     scene.add(base);
@@ -224,7 +224,7 @@ export default function Surface3D({
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 64;
     const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#171009";
+    ctx.fillStyle = "#F2EFE6";
     ctx.font = "bold 40px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -345,7 +345,7 @@ export default function Surface3D({
       <div className="mt-3 flex flex-wrap items-center gap-3">
         <button
           onClick={() => setPlaying((p) => !p)}
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-forest text-sm text-white shadow-soft transition hover:bg-forest-600"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-forest text-sm text-cream shadow-soft transition hover:bg-forest-600"
           aria-label={playing ? "Pausar" : "Reproducir"}
         >
           {playing ? "❚❚" : "▶"}
@@ -359,7 +359,7 @@ export default function Surface3D({
             setPlaying(false);
             setFrame(Number(e.target.value));
           }}
-          className="h-1.5 min-w-[140px] flex-1 cursor-pointer appearance-none rounded-full bg-line accent-[#222D67]"
+          className="h-1.5 min-w-[140px] flex-1 cursor-pointer appearance-none rounded-full bg-line accent-[#7C8AD9]"
         />
         <div className="flex items-center gap-2 text-[11px] text-ink-muted">
           <span>Estrés</span>
@@ -367,7 +367,7 @@ export default function Surface3D({
             className="h-2 w-24 rounded-full"
             style={{
               background:
-                "linear-gradient(90deg,#DC2626,#D97706 38%,#689149 72%,#222D67)",
+                "linear-gradient(90deg,#DC2626,#D97706 38%,#689149 72%,#33501F)",
             }}
           />
           <span>Vigor</span>

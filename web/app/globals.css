@@ -3,14 +3,14 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 html,
 body {
-  background: linear-gradient(180deg, #fcfaf3 0%, #f9f6ee 320px);
-  background-color: #f9f6ee;
-  color: #171009;
+  background: linear-gradient(180deg, #04121d 0%, #010a12 360px);
+  background-color: #010a12;
+  color: #f2efe6;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -21,60 +21,60 @@ input[type="range"]::-webkit-slider-thumb {
   height: 16px;
   width: 16px;
   border-radius: 9999px;
-  background: #222d67;
-  border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(18, 5, 0, 0.28);
+  background: #f9f6ee;
+  border: 2px solid #010a12;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   cursor: pointer;
 }
 input[type="range"]::-moz-range-thumb {
   height: 16px;
   width: 16px;
   border-radius: 9999px;
-  background: #222d67;
-  border: 2px solid #ffffff;
-  box-shadow: 0 1px 3px rgba(18, 5, 0, 0.28);
+  background: #f9f6ee;
+  border: 2px solid #010a12;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   cursor: pointer;
 }
 
 /* Leaflet: fondo del contenedor y tipografía del sistema */
 .leaflet-container {
-  background: #ece6d9;
+  background: #08111d;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Controles de Leaflet acordes al tema */
+/* Controles de Leaflet acordes al tema oscuro */
 .leaflet-bar a,
 .leaflet-draw-toolbar a {
-  background-color: #ffffff !important;
-  color: #171009 !important;
-  border-color: #e6e0d2 !important;
+  background-color: #0c1428 !important;
+  color: #f2efe6 !important;
+  border-color: #26314c !important;
 }
 .leaflet-bar a:hover {
-  background-color: #f9f6ee !important;
+  background-color: #16203a !important;
 }
 .leaflet-tooltip {
-  background: #ffffff;
-  border: 1px solid #e6e0d2;
-  color: #171009;
+  background: #0c1428;
+  border: 1px solid #26314c;
+  color: #f2efe6;
   border-radius: 8px;
-  box-shadow: 0 1px 2px rgba(18, 5, 0, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
   font-weight: 500;
 }
 .leaflet-tooltip-top::before {
-  border-top-color: #e6e0d2;
+  border-top-color: #26314c;
 }
 
-/* Scrollbar cálido y sutil */
+/* Scrollbar oscuro y sutil */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 ::-webkit-scrollbar-thumb {
-  background: #e2dccc;
+  background: #1f2942;
   border-radius: 6px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #d4ccb8;
+  background: #2b385a;
 }
 ::-webkit-scrollbar-track {
   background: transparent;
