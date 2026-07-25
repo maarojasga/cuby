@@ -13,6 +13,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { analyze, getRecommendations, hasLiveBackend } from "@/lib/api";
 import type { Recommended, Report } from "@/lib/types";
 import { riskColor } from "@/lib/ui";
+import ChatDock from "./ChatDock";
 import CreditView from "./CreditView";
 import FarmerView from "./FarmerView";
 import Logo from "./Logo";
@@ -635,6 +636,10 @@ function ReadyStage({
           <FarmerView report={report} />
         )}
       </main>
+
+      {/* Deja aire abajo para que la barra de Cuby no tape el contenido */}
+      <div className="h-20 lg:col-span-2" />
+      <ChatDock report={report} />
     </div>
   );
 }
