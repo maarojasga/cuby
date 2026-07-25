@@ -7,8 +7,6 @@
 import dynamic from "next/dynamic";
 import Link from "next/link";
 
-import Logo from "./Logo";
-
 const HeroSatellite = dynamic(() => import("./HeroSatellite"), { ssr: false });
 
 const HOLO = "#00c2e4";
@@ -34,8 +32,19 @@ export default function Landing() {
 
       {/* Contenido: la mitad inferior, dejando el satélite arriba */}
       <div className="pointer-events-none relative z-10 flex min-h-screen flex-col items-center justify-end px-4 pb-14 text-center">
-        <Logo variant="hero" priority className="drop-shadow-[0_0_40px_rgba(0,194,228,0.2)]" />
-        <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/60">
+        <h1
+          className="text-6xl font-extrabold tracking-tight sm:text-7xl"
+          style={{ textShadow: "0 0 40px rgba(0,194,228,0.25)" }}
+        >
+          Cuby
+        </h1>
+        <p
+          className="mt-2 text-xl font-medium sm:text-2xl"
+          style={{ color: HOLO, textShadow: `0 0 14px ${HOLO}66` }}
+        >
+          Imágenes satelitales
+        </p>
+        <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/60">
           Inteligencia agrícola sobre Sentinel-2: score crediticio de parcelas
           para entidades financieras y alertas tempranas de estrés para el
           agricultor. NDVI · NDMI · NDRE.
