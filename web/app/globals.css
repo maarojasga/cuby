@@ -8,9 +8,32 @@
 
 html,
 body {
-  background: #fcf2df;
+  background: linear-gradient(180deg, #fdf6e9 0%, #fcf2df 320px);
+  background-color: #fcf2df;
   color: #1c1917;
   -webkit-font-smoothing: antialiased;
+}
+
+/* Slider temporal del relieve 3D */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #1b4d3e;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.25);
+  cursor: pointer;
+}
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  border-radius: 9999px;
+  background: #1b4d3e;
+  border: 2px solid #ffffff;
+  box-shadow: 0 1px 3px rgba(28, 25, 23, 0.25);
+  cursor: pointer;
 }
 
 /* Leaflet: fondo del contenedor y tipografía del sistema */

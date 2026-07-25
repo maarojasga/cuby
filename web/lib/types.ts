@@ -46,6 +46,14 @@ export type AlertReport = {
   ultimos_valores: Record<string, number>;
 };
 
+// Grilla por píxel de las últimas lecturas, para el relieve 3D.
+export type SurfaceData = {
+  index: string;
+  dates: string[];
+  frames: (number | null)[][][]; // [frame][fila][columna], null fuera del lote
+  north: "first_row" | "last_row";
+};
+
 export type Report = {
   parcela: string;
   parcel_id: string | null;
@@ -61,6 +69,7 @@ export type Report = {
     ndmi: SeriesPoint[];
     ndre: SeriesPoint[];
   };
+  surface?: SurfaceData | null;
   credito: {
     score: GreenScore;
     verificacion_cultivo: CropCheck;
@@ -81,4 +90,5 @@ export type ParcelSummary = {
   score: number;
   risk_level: GreenScore["risk_level"];
   estado_alertas: "ok" | "alerta";
+  spark?: number[]; // mini-serie NDVI para el sparkline de la lista
 };

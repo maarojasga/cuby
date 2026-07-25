@@ -11,12 +11,14 @@
     "sync-demo": "node scripts/sync-demo.mjs"
   },
   "dependencies": {
+    "@types/three": "^0.185.1",
     "leaflet": "^1.9.4",
     "leaflet-draw": "^1.0.4",
     "next": "14.2.5",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "recharts": "^2.12.7"
+    "recharts": "^2.12.7",
+    "three": "^0.185.1"
   },
   "devDependencies": {
     "@types/geojson": "^7946.0.14",

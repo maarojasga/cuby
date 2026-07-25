@@ -21,19 +21,31 @@ export function Card({
   );
 }
 
+// Rótulo pequeño en mayúsculas sobre los títulos: da jerarquía editorial.
+export function Eyebrow({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-forest-600">
+      {children}
+    </div>
+  );
+}
+
 export function SectionTitle({
   children,
   hint,
+  eyebrow,
 }: {
   children: ReactNode;
   hint?: string;
+  eyebrow?: string;
 }) {
   return (
     <div className="mb-3">
-      <h3 className="text-sm font-semibold tracking-wide text-ink-primary">
+      {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
+      <h3 className="text-base font-bold tracking-tight text-ink-primary">
         {children}
       </h3>
-      {hint && <p className="mt-0.5 text-xs text-ink-muted">{hint}</p>}
+      {hint && <p className="mt-0.5 text-xs leading-relaxed text-ink-muted">{hint}</p>}
     </div>
   );
 }
@@ -71,7 +83,7 @@ export function MeterBar({
       </div>
       <div className="h-2 overflow-hidden rounded-full bg-[#EFE6D3]">
         <div
-          className="h-full rounded-full"
+          className="h-full rounded-full transition-[width] duration-700"
           style={{ width: `${w}%`, background: color }}
         />
       </div>
@@ -93,7 +105,7 @@ export function Stat({
       <div className="text-[11px] uppercase tracking-wide text-ink-muted">
         {label}
       </div>
-      <div className="mt-0.5 text-lg font-semibold tabular-nums text-ink-primary">
+      <div className="mt-0.5 text-lg font-bold tabular-nums tracking-tight text-ink-primary">
         {value}
       </div>
       {sub && <div className="text-[11px] text-ink-muted">{sub}</div>}
@@ -110,10 +122,48 @@ export function Pill({
 }) {
   return (
     <span
-      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
-      style={{ background: `${color}1a`, color }}
+      className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold"
+      style={{ background: `${color}16`, color }}
     >
       {children}
     </span>
+  );
+}
+
+// Mini serie NDVI para las filas de parcela: forma del último par de meses.
+export function Sparkline({
+  data,
+  color = "#2D6A4F",
+  width = 72,
+  height = 26,
+}: {
+  data?: number[];
+  color?: string;
+  width?: number;
+  height?: number;
+}) {
+  if (!data || data.length < 2) return null;
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const span = max - min || 1;
+  const pts = data
+    .map((v, i) => {
+      const x = (i / (data.length - 1)) * width;
+      const y = height - 3 - ((v - min) / span) * (height - 6);
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    })
+    .join(" ");
+  return (
+    <svg width={width} height={height} className="shrink-0" aria-hidden>
+      <polyline
+        points={pts}
+        fill="none"
+        stroke={color}
+        strokeWidth={1.6}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        opacity={0.85}
+      />
+    </svg>
   );
 }

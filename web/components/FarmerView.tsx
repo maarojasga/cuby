@@ -6,7 +6,6 @@ import {
   INDEX_HELP,
   INDEX_LABEL,
   fmtDate,
-  pct,
   severityColor,
 } from "@/lib/ui";
 import IndexChart from "./IndexChart";
@@ -24,33 +23,43 @@ export default function FarmerView({ report }: { report: Report }) {
   const last = a.ultimos_valores || {};
   const ok = a.estado === "ok";
 
-  // Últimos ~90 días para el panel de monitoreo reciente.
+  // Últimos ~4 meses para el panel de monitoreo reciente.
   const recent = (arr: Report["series"]["ndvi"]) => arr.slice(-24);
 
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-3">
       {/* Estado y alertas */}
-      <div className="flex flex-col gap-4 xl:col-span-1">
+      <div className="flex flex-col gap-5 xl:col-span-1">
         <Card>
-          <SectionTitle hint={`Evaluado hasta ${a.evaluado_hasta ? fmtDate(a.evaluado_hasta) : "—"}`}>
+          <SectionTitle
+            eyebrow="Módulo agricultor"
+            hint={`Evaluado hasta ${a.evaluado_hasta ? fmtDate(a.evaluado_hasta) : "—"} · cada ~5 días`}
+          >
             Estado de la parcela
           </SectionTitle>
           <div
-            className="flex items-center gap-3 rounded-xl px-4 py-3"
+            className="flex items-center gap-3.5 rounded-xl px-4 py-3.5"
             style={{
-              background: ok ? "#2D6A4F15" : "#DC262615",
+              background: ok ? "#2D6A4F12" : "#DC262612",
               color: ok ? "#2D6A4F" : "#DC2626",
             }}
           >
-            <span className="text-2xl">{ok ? "✓" : "⚠"}</span>
+            <span
+              className="flex h-10 w-10 items-center justify-center rounded-full text-lg text-white"
+              style={{ background: ok ? "#2D6A4F" : "#DC2626" }}
+            >
+              {ok ? "✓" : "!"}
+            </span>
             <div>
-              <div className="text-base font-semibold">
-                {ok ? "Sin alertas" : `${a.alertas.length} alerta${a.alertas.length > 1 ? "s" : ""} activa${a.alertas.length > 1 ? "s" : ""}`}
+              <div className="text-base font-extrabold">
+                {ok
+                  ? "Sin alertas"
+                  : `${a.alertas.length} alerta${a.alertas.length > 1 ? "s" : ""} activa${a.alertas.length > 1 ? "s" : ""}`}
               </div>
               <div className="text-xs opacity-80">
                 {ok
                   ? "El cultivo se comporta dentro de lo normal."
-                  : "Se detectaron cambios bruscos en las últimas pasadas."}
+                  : "Cambios bruscos en las últimas pasadas del satélite."}
               </div>
             </div>
           </div>
@@ -69,19 +78,24 @@ export default function FarmerView({ report }: { report: Report }) {
             style={{ borderLeftColor: severityColor(al.severidad) }}
           >
             <div className="flex items-start gap-3">
-              <span className="text-2xl leading-none">{ALERT_ICON[al.tipo]}</span>
+              <span
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-lg"
+                style={{ background: `${severityColor(al.severidad)}14` }}
+              >
+                {ALERT_ICON[al.tipo]}
+              </span>
               <div className="flex-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span
-                    className="rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase"
+                    className="rounded-full px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide"
                     style={{
-                      background: `${severityColor(al.severidad)}22`,
+                      background: `${severityColor(al.severidad)}16`,
                       color: severityColor(al.severidad),
                     }}
                   >
                     {al.severidad === "alta" ? "Alerta alta" : "Aviso"}
                   </span>
-                  <span className="text-xs text-ink-muted">
+                  <span className="text-xs font-semibold text-ink-muted">
                     {al.indice}
                     {al.caida_pct != null ? ` · −${al.caida_pct}%` : ""}
                   </span>
@@ -96,11 +110,14 @@ export default function FarmerView({ report }: { report: Report }) {
       </div>
 
       {/* Índices recientes */}
-      <div className="flex flex-col gap-4 xl:col-span-2">
+      <div className="flex flex-col gap-5 xl:col-span-2">
         <Card>
-          <div className="flex items-center justify-between">
-            <SectionTitle hint="Las tres señales que anticipan estrés, en cada pasada de Sentinel-2 (~5 días)">
-              Monitoreo reciente
+          <div className="flex flex-wrap items-start justify-between gap-2">
+            <SectionTitle
+              eyebrow="Monitoreo continuo"
+              hint="Las tres señales que anticipan estrés, en cada pasada de Sentinel-2 (~5 días)"
+            >
+              Señales recientes
             </SectionTitle>
             <div className="flex gap-3">
               <LegendItem color={INDEX_COLOR.ndvi} label="NDVI" />
@@ -110,28 +127,43 @@ export default function FarmerView({ report }: { report: Report }) {
           </div>
           <IndexChart
             lines={[
-              { key: "ndvi", label: "NDVI", color: INDEX_COLOR.ndvi, data: recent(report.series.ndvi) },
-              { key: "ndmi", label: "NDMI", color: INDEX_COLOR.ndmi, data: recent(report.series.ndmi) },
-              { key: "ndre", label: "NDRE", color: INDEX_COLOR.ndre, data: recent(report.series.ndre) },
+              {
+                key: "ndvi",
+                label: "NDVI",
+                color: INDEX_COLOR.ndvi,
+                data: recent(report.series.ndvi),
+              },
+              {
+                key: "ndmi",
+                label: "NDMI",
+                color: INDEX_COLOR.ndmi,
+                data: recent(report.series.ndmi),
+              },
+              {
+                key: "ndre",
+                label: "NDRE",
+                color: INDEX_COLOR.ndre,
+                data: recent(report.series.ndre),
+              },
             ]}
             domain={[-0.2, 1]}
             height={280}
           />
         </Card>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
           {(["ndvi", "ndmi", "ndre"] as const).map((k) => (
-            <Card key={k}>
-              <div className="mb-2 flex items-center gap-2">
-                <span
-                  className="h-2.5 w-2.5 rounded-full"
-                  style={{ background: INDEX_COLOR[k] }}
-                />
-                <span className="text-sm font-semibold text-ink-primary">
-                  {INDEX_LABEL[k]}
-                </span>
+            <Card
+              key={k}
+              className="border-t-4"
+              style={{ borderTopColor: INDEX_COLOR[k] }}
+            >
+              <div className="mb-1.5 text-sm font-bold text-ink-primary">
+                {INDEX_LABEL[k]}
               </div>
-              <p className="text-xs leading-relaxed text-ink-muted">{INDEX_HELP[k]}</p>
+              <p className="text-xs leading-relaxed text-ink-muted">
+                {INDEX_HELP[k]}
+              </p>
             </Card>
           ))}
         </div>

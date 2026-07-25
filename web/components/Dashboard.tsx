@@ -7,13 +7,22 @@ import type { ParcelSummary, Report } from "@/lib/types";
 import { riskColor } from "@/lib/ui";
 import CreditView from "./CreditView";
 import FarmerView from "./FarmerView";
-import { Pill } from "./primitives";
+import { Card, Pill, SectionTitle, Sparkline } from "./primitives";
 
 const ParcelMap = dynamic(() => import("./ParcelMap"), {
   ssr: false,
   loading: () => (
     <div className="flex h-full items-center justify-center text-sm text-ink-muted">
       Cargando mapa…
+    </div>
+  ),
+});
+
+const Surface3D = dynamic(() => import("./Surface3D"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[400px] items-center justify-center text-sm text-ink-muted">
+      Preparando relieve 3D…
     </div>
   ),
 });
@@ -67,13 +76,13 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[1400px] flex-col px-4 py-5 lg:px-6">
+    <div className="mx-auto flex min-h-screen max-w-[1440px] flex-col px-4 py-5 lg:px-8">
       <Header mode={mode} setMode={setMode} />
 
-      <div className="mt-5 grid flex-1 grid-cols-1 gap-5 lg:grid-cols-[380px_1fr]">
-        {/* Panel izquierdo: mapa + parcelas */}
+      <div className="mt-6 grid flex-1 grid-cols-1 gap-6 lg:grid-cols-[368px_1fr]">
+        {/* ── Panel izquierdo: mapa + parcelas ── */}
         <aside className="flex flex-col gap-4">
-          <div className="h-[300px] overflow-hidden rounded-2xl border border-line bg-card shadow-card lg:h-[380px]">
+          <div className="relative h-[300px] overflow-hidden rounded-2xl border border-line bg-card shadow-card lg:h-[340px]">
             <ParcelMap
               parcels={parcels}
               selectedId={selectedId}
@@ -84,6 +93,9 @@ export default function Dashboard() {
               onDraw={onDraw}
               drawing={drawing}
             />
+            <div className="pointer-events-none absolute right-3 top-3 z-[500] rounded-full border border-line bg-card/90 px-2.5 py-1 text-[11px] font-semibold text-ink-secondary shadow-soft backdrop-blur">
+              🛰️ Satélite · Colombia
+            </div>
           </div>
 
           <button
@@ -95,10 +107,10 @@ export default function Dashboard() {
                   : null
               );
             }}
-            className={`rounded-xl border px-4 py-2.5 text-sm font-medium transition ${
+            className={`rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${
               drawing
                 ? "border-ocean/40 bg-ocean/10 text-ocean"
-                : "border-line bg-card text-ink-secondary shadow-soft hover:bg-cream"
+                : "border-line bg-card text-ink-secondary shadow-soft hover:border-forest/30 hover:text-forest"
             }`}
           >
             {drawing
@@ -107,7 +119,7 @@ export default function Dashboard() {
           </button>
 
           <div className="flex flex-col gap-2">
-            <div className="px-1 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            <div className="px-1 text-[11px] font-bold uppercase tracking-[0.14em] text-ink-muted">
               Parcelas de demostración
             </div>
             {parcels.map((p) => (
@@ -124,7 +136,7 @@ export default function Dashboard() {
           </div>
         </aside>
 
-        {/* Panel derecho: la vista */}
+        {/* ── Panel derecho ── */}
         <main className="min-w-0">
           {notice && (
             <div className="mb-4 rounded-xl border border-ndre/25 bg-ndre/[0.08] px-4 py-3 text-sm text-[#92500a]">
@@ -138,7 +150,22 @@ export default function Dashboard() {
           )}
           {report && (
             <>
-              <ReportHeader report={report} selected={selected} loading={loading} />
+              <Hero report={report} selected={selected} loading={loading} />
+
+              {report.surface && (
+                <Card className="mb-6 overflow-hidden">
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <SectionTitle
+                      eyebrow="Últimas 12 lecturas · Sentinel-2"
+                      hint="Cada píxel del lote como relieve: la altura y el color son el vigor del cultivo (NDVI). Arrastrá para rotar, movete en el tiempo con la línea."
+                    >
+                      Terreno vivo en 3D
+                    </SectionTitle>
+                  </div>
+                  <Surface3D surface={report.surface} height={400} />
+                </Card>
+              )}
+
               {mode === "credito" ? (
                 <CreditView report={report} />
               ) : (
@@ -156,26 +183,32 @@ export default function Dashboard() {
 
 function Header({ mode, setMode }: { mode: Mode; setMode: (m: Mode) => void }) {
   return (
-    <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-      <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-forest text-xl shadow-soft">
+    <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="flex items-center gap-3.5">
+        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-forest text-2xl shadow-card">
           🛰️
         </div>
         <div>
-          <h1 className="text-lg font-bold leading-tight text-ink-primary">
-            Cuby · Inteligencia Agrícola
+          <h1 className="text-xl font-extrabold tracking-tight text-ink-primary">
+            Cuby
+            <span className="ml-2 rounded-full bg-forest/10 px-2 py-0.5 align-middle text-[11px] font-bold uppercase tracking-wide text-forest">
+              AgTech
+            </span>
           </h1>
           <p className="text-xs text-ink-muted">
-            Score de Riesgo Verde &amp; Alertas Tempranas · Sentinel-2
+            Score de Riesgo Verde &amp; Alertas Tempranas con Sentinel-2
           </p>
         </div>
       </div>
 
-      <div className="inline-flex rounded-xl border border-line bg-card p-1 shadow-soft">
+      <div className="inline-flex self-start rounded-full border border-line bg-card p-1 shadow-soft sm:self-auto">
         <ToggleBtn active={mode === "credito"} onClick={() => setMode("credito")}>
           🏦 Entidad financiera
         </ToggleBtn>
-        <ToggleBtn active={mode === "agricultor"} onClick={() => setMode("agricultor")}>
+        <ToggleBtn
+          active={mode === "agricultor"}
+          onClick={() => setMode("agricultor")}
+        >
           🌱 Agricultor
         </ToggleBtn>
       </div>
@@ -195,7 +228,7 @@ function ToggleBtn({
   return (
     <button
       onClick={onClick}
-      className={`rounded-lg px-3.5 py-1.5 text-sm font-medium transition ${
+      className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
         active
           ? "bg-forest text-white shadow-soft"
           : "text-ink-muted hover:text-ink-primary"
@@ -215,35 +248,44 @@ function ParcelRow({
   active: boolean;
   onClick: () => void;
 }) {
+  const color = riskColor(p.risk_level);
   return (
     <button
       onClick={onClick}
-      className={`flex items-center justify-between rounded-xl border px-3 py-2.5 text-left transition ${
+      className={`group flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left transition ${
         active
-          ? "border-forest/40 bg-forest/[0.06] shadow-soft"
-          : "border-line bg-card hover:bg-cream"
+          ? "border-forest/40 bg-card shadow-card"
+          : "border-line-soft bg-card/60 hover:border-line hover:bg-card hover:shadow-soft"
       }`}
     >
-      <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-ink-primary">{p.name}</div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          {p.estado_alertas === "alerta" && (
+            <span
+              className="h-2 w-2 shrink-0 animate-pulse rounded-full bg-[#DC2626]"
+              title="Alerta activa"
+            />
+          )}
+          <div className="truncate text-sm font-bold text-ink-primary">
+            {p.name}
+          </div>
+        </div>
         <div className="truncate text-xs text-ink-muted">
           {p.crop} · {p.region}
         </div>
       </div>
-      <div className="flex items-center gap-2 pl-2">
-        {p.estado_alertas === "alerta" && <span title="Alerta activa">🔴</span>}
-        <span
-          className="rounded-lg px-2 py-1 text-xs font-bold tabular-nums"
-          style={{ background: `${riskColor(p.risk_level)}18`, color: riskColor(p.risk_level) }}
-        >
-          {p.score}
-        </span>
-      </div>
+      <Sparkline data={p.spark} color={color} />
+      <span
+        className="rounded-lg px-2 py-1 text-sm font-extrabold tabular-nums"
+        style={{ background: `${color}14`, color }}
+      >
+        {p.score}
+      </span>
     </button>
   );
 }
 
-function ReportHeader({
+function Hero({
   report,
   selected,
   loading,
@@ -253,21 +295,66 @@ function ReportHeader({
   loading: boolean;
 }) {
   const isDemo = report.meta?.source === "demo";
+  const score = report.credito.score;
+  const color = riskColor(score.risk_level);
+  const nAlerts = report.alertas.alertas.length;
+
   return (
-    <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-      <div>
-        <h2 className="text-xl font-bold text-ink-primary">{report.parcela}</h2>
-        <p className="text-sm text-ink-muted">
-          {report.meta?.crop ? `${report.meta.crop} · ` : ""}
-          {report.meta?.region || selected?.region || ""}
-        </p>
+    <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+      <div className="min-w-0">
+        <div className="mb-1 text-[11px] font-bold uppercase tracking-[0.14em] text-forest-600">
+          {report.meta?.crop || "Parcela"} ·{" "}
+          {report.meta?.region || selected?.region || "—"}
+        </div>
+        <h2 className="text-2xl font-extrabold tracking-tight text-ink-primary lg:text-3xl">
+          {report.parcela}
+        </h2>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <Pill color={isDemo ? "#8A8072" : "#2D6A4F"}>
+            {isDemo ? "◦ Datos de demostración" : "● Sentinel-2 en vivo"}
+          </Pill>
+          <span className="text-xs text-ink-muted">
+            {report.cobertura.n_fechas} lecturas ·{" "}
+            {report.cobertura.validez_media != null
+              ? `validez ${Math.round(report.cobertura.validez_media * 100)}%`
+              : ""}
+          </span>
+          {loading && (
+            <span className="text-xs text-ink-muted">actualizando…</span>
+          )}
+        </div>
       </div>
-      <div className="flex items-center gap-2">
-        {loading && <span className="text-xs text-ink-muted">actualizando…</span>}
-        <Pill color={isDemo ? "#8A8072" : "#2D6A4F"}>
-          {isDemo ? "Datos de demostración" : "Sentinel-2 en vivo"}
-        </Pill>
-        <span className="text-xs text-ink-muted">{report.cobertura.n_fechas} fechas</span>
+
+      <div className="flex items-center gap-4">
+        {nAlerts > 0 && (
+          <div className="flex items-center gap-2 rounded-xl bg-[#DC2626]/[0.08] px-3.5 py-2">
+            <span className="text-lg">⚠️</span>
+            <div>
+              <div className="text-sm font-extrabold text-[#DC2626]">
+                {nAlerts} alerta{nAlerts > 1 ? "s" : ""}
+              </div>
+              <div className="text-[10px] uppercase tracking-wide text-[#DC2626]/70">
+                activas
+              </div>
+            </div>
+          </div>
+        )}
+        <div className="flex items-center gap-2.5">
+          <div
+            className="flex h-14 w-14 items-center justify-center rounded-2xl text-xl font-extrabold text-white shadow-card"
+            style={{ background: color }}
+          >
+            {score.score}
+          </div>
+          <div>
+            <div className="text-sm font-bold" style={{ color }}>
+              {score.risk_band}
+            </div>
+            <div className="text-[10px] uppercase tracking-wide text-ink-muted">
+              Score de Riesgo Verde
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -275,9 +362,9 @@ function ReportHeader({
 
 function Footer() {
   return (
-    <footer className="mt-8 border-t border-line pt-4 text-center text-xs text-ink-muted">
-      Índices Sentinel-2 · NDVI (B8-B4) biomasa · NDMI (B8-B11) humedad · NDRE
-      (B8-B5) clorofila · Copernicus / Microsoft Planetary Computer
+    <footer className="mt-10 border-t border-line pt-5 text-center text-xs text-ink-muted">
+      Índices Sentinel-2 · NDVI (B8−B4) biomasa · NDMI (B8−B11) humedad · NDRE
+      (B8−B5) clorofila · Copernicus / Microsoft Planetary Computer
     </footer>
   );
 }

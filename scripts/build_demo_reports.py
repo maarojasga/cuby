@@ -50,7 +50,13 @@ def _ndvi(story: str, dates: np.ndarray, rng: np.random.Generator) -> np.ndarray
         return np.clip(0.80 + 0.03 * _seasonal_shape(dates, 1) + 0.01 * rng.standard_normal(n), 0, 1)
 
     cycles = 2 if story in ("variable", "stressed") else 1  # arroz: dos campañas/año
-    shape = _seasonal_shape(dates, cycles)
+    # Fase por historia: todas las parcelas de demo están en campaña "hoy",
+    # así el relieve 3D de las últimas lecturas muestra el cultivo desarrollado
+    # y no el rastrojo de fin de temporada. El lote estresado queda justo en el
+    # pico: el estrés golpea con el cultivo verde y alto, que es cuando el 3D
+    # lo delata.
+    phase = {"stressed": 0.5, "variable": 0.3}.get(story, 0.45)
+    shape = _seasonal_shape(dates, cycles, phase=phase)
 
     year_idx = ((dates - dates[0]) / np.timedelta64(365, "D")).astype(int)
     n_years = len(np.unique(year_idx)) + 1
@@ -115,6 +121,59 @@ def _valid_fraction(story: str, n: int, rng: np.random.Generator) -> np.ndarray:
     return np.clip(mean + 0.12 * rng.standard_normal(n), 0.05, 1.0).astype("float32")
 
 
+# --- Superficie 3D: grilla NDVI por píxel de las últimas lecturas ---
+
+SURFACE_N = 26      # celdas por lado
+SURFACE_FRAMES = 12  # últimas lecturas (~2 meses de Sentinel-2)
+
+
+def _surface(feat: dict, story: str, dates: np.ndarray,
+             ndvi_v: np.ndarray, rng: np.random.Generator) -> dict:
+    """Fabrica la grilla espacial que alimenta el relieve 3D del frontend.
+
+    La base de cada frame es el valor medio de la serie en esa fecha; encima va
+    una textura espacial suave y fija por parcela (los surcos y manchones que
+    un lote real siempre tiene). En la historia 'stressed', un manchón en la
+    zona norte se profundiza en las últimas lecturas — la anomalía localizada
+    que el promedio del polígono todavía disimula.
+    """
+    from shapely.geometry import Point, shape
+
+    geom = shape(feat["geometry"])
+    minx, miny, maxx, maxy = geom.bounds
+    n = SURFACE_N
+    xs = np.linspace(minx, maxx, n)
+    ys = np.linspace(miny, maxy, n)  # ascendente: la última fila es el norte
+    mask = np.array([[geom.contains(Point(x, y)) for x in xs] for y in ys])
+
+    gx, gy = np.meshgrid(np.linspace(0, 1, n), np.linspace(0, 1, n))
+    ph = rng.uniform(0, 2 * np.pi, 3)
+    texture = (
+        0.5 * np.sin(2 * np.pi * gx * 1.7 + ph[0])
+        + 0.5 * np.sin(2 * np.pi * gy * 1.3 + ph[1])
+        + 0.3 * np.sin(2 * np.pi * (gx + gy) * 2.3 + ph[2])
+    )
+    texture /= max(float(np.abs(texture).max()), 1e-6)
+
+    k = SURFACE_FRAMES
+    out_dates = [str(d.astype("datetime64[D]")) for d in dates[-k:]]
+    frames = []
+    for i, base in enumerate(ndvi_v[-k:]):
+        f = base * (1 + 0.08 * texture) + 0.012 * rng.standard_normal((n, n))
+        if story == "stressed":
+            # El manchón aparece en las últimas 5 lecturas y crece.
+            t = max(0.0, i - (k - 5)) / 4.0
+            dist = np.sqrt((gx - 0.5) ** 2 + ((gy - 0.8) / 0.6) ** 2)
+            f *= 1 - 0.55 * t * np.exp(-((dist / 0.28) ** 2))
+        vals = np.clip(f, 0.0, 1.0)
+        frames.append([
+            [round(float(vals[r, c]), 3) if mask[r, c] else None for c in range(n)]
+            for r in range(n)
+        ])
+
+    return {"index": "ndvi", "dates": out_dates, "frames": frames, "north": "last_row"}
+
+
 def build_one(feat: dict) -> dict:
     props = feat["properties"]
     story = props.get("story", "healthy")
@@ -147,6 +206,7 @@ def build_one(feat: dict) -> dict:
             "geometry": feat["geometry"],
             "source": "demo",  # marca honesta: datos sintéticos, no Sentinel-2 real
         },
+        surface=_surface(feat, story, dates, ndvi_v, rng),
     )
     return report
 
@@ -168,6 +228,8 @@ def main() -> None:
             "score": s["score"],
             "risk_level": s["risk_level"],
             "estado_alertas": report["alertas"]["estado"],
+            # Mini-serie para el sparkline de la lista de parcelas.
+            "spark": [p["value"] for p in report["series"]["ndvi"][-24:]],
         })
         print(f"  {pid}: score {s['score']} ({s['risk_level']}), alertas {report['alertas']['estado']}")
     (OUT / "index.json").write_text(json.dumps(index, ensure_ascii=False, indent=2), encoding="utf-8")
