@@ -630,7 +630,7 @@ function Hero({ report }: { report: Report }) {
           {report.parcela}
         </h2>
         <div className="mt-2 flex flex-wrap items-center gap-2">
-          <Pill color="#2D6A4F">● Sentinel-2 en vivo</Pill>
+          <Pill color="#689149">● Sentinel-2 en vivo</Pill>
           <span className="text-xs text-ink-muted">
             {report.cobertura.n_fechas} lecturas
             {report.cobertura.validez_media != null

@@ -5,38 +5,38 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        // Warm Organic AgTech
-        cream: "#FCF2DF", // fondo base (pantalla)
+        // Paleta: navy + verde sobre blanco cálido
+        cream: "#F9F6EE", // fondo base (pantalla)
         card: "#FFFFFF", // superficies / tarjetas
         line: {
-          DEFAULT: "#E7DBC3", // borde suave sobre crema
-          soft: "#EFE6D3", // hairline aún más tenue (grid)
+          DEFAULT: "#E6E0D2", // borde suave
+          soft: "#F1ECE0", // hairline aún más tenue (grid)
         },
         forest: {
-          DEFAULT: "#1B4D3E", // verde bosque profundo (identidad)
-          600: "#2D6A4F", // verde vegetación (acciones / bueno)
+          DEFAULT: "#222D67", // navy profundo (identidad / acciones)
+          600: "#689149", // verde vegetación (acento / bueno)
         },
-        ocean: "#2A6F97", // acento satelital / datos
+        ocean: "#222D67", // navy — datos / agua
         ink: {
-          primary: "#1C1917", // pizarra cálida
-          secondary: "#57534E",
-          muted: "#8A8072",
+          primary: "#171009", // neutro cálido muy oscuro
+          secondary: "#4F4A40",
+          muted: "#8C857A",
         },
         // Índices espectrales
-        ndvi: "#2D6A4F", // biomasa / salud
-        ndmi: "#2A6F97", // humedad / agua
-        ndre: "#D97706", // clorofila / alerta temprana
-        // Estado / riesgo
+        ndvi: "#689149", // biomasa / salud (verde)
+        ndmi: "#222D67", // humedad / agua (navy)
+        ndre: "#D97706", // clorofila / alerta temprana (ámbar)
+        // Estado / riesgo (ámbar y rojo reservados por significado)
         risk: {
-          bajo: "#2D6A4F",
+          bajo: "#689149",
           medio: "#D97706",
           alto: "#DC2626",
         },
       },
       boxShadow: {
-        // Elevación limpia sin sombras pesadas
-        card: "0 1px 2px rgba(28,25,23,0.04), 0 6px 16px rgba(28,25,23,0.05)",
-        soft: "0 1px 2px rgba(28,25,23,0.04)",
+        // Elevación limpia sin sombras pesadas (tono cálido de la paleta)
+        card: "0 1px 2px rgba(18,5,0,0.05), 0 6px 16px rgba(18,5,0,0.06)",
+        soft: "0 1px 2px rgba(18,5,0,0.05)",
       },
       fontFamily: {
         sans: ["system-ui", "-apple-system", "Segoe UI", "sans-serif"],

@@ -20,8 +20,8 @@ const FRAME_MS = 850; // cadencia de la animación temporal
 const STOPS: [number, THREE.Color][] = [
   [0.15, new THREE.Color("#DC2626")], // estrés severo
   [0.4, new THREE.Color("#D97706")], // estrés / suelo
-  [0.65, new THREE.Color("#2D6A4F")], // vigor
-  [0.9, new THREE.Color("#1B4D3E")], // vigor pleno
+  [0.65, new THREE.Color("#689149")], // vigor
+  [0.9, new THREE.Color("#33501F")], // vigor pleno (verde profundo)
 ];
 
 function valueColor(v: number, out: THREE.Color) {
@@ -215,7 +215,7 @@ export default function Surface3D({
     // Pedestal: una placa crema con el contorno del bbox, para asentarlo.
     const base = new THREE.Mesh(
       new THREE.BoxGeometry(W + 0.25, 0.06, D + 0.25),
-      new THREE.MeshStandardMaterial({ color: 0xf1e7d2, roughness: 1 })
+      new THREE.MeshStandardMaterial({ color: 0xede7d8, roughness: 1 })
     );
     base.position.y = -0.05;
     scene.add(base);
@@ -224,7 +224,7 @@ export default function Surface3D({
     const canvas = document.createElement("canvas");
     canvas.width = canvas.height = 64;
     const ctx = canvas.getContext("2d")!;
-    ctx.fillStyle = "#1C1917";
+    ctx.fillStyle = "#171009";
     ctx.font = "bold 40px system-ui, sans-serif";
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
@@ -359,7 +359,7 @@ export default function Surface3D({
             setPlaying(false);
             setFrame(Number(e.target.value));
           }}
-          className="h-1.5 min-w-[140px] flex-1 cursor-pointer appearance-none rounded-full bg-line accent-[#1B4D3E]"
+          className="h-1.5 min-w-[140px] flex-1 cursor-pointer appearance-none rounded-full bg-line accent-[#222D67]"
         />
         <div className="flex items-center gap-2 text-[11px] text-ink-muted">
           <span>Estrés</span>
@@ -367,7 +367,7 @@ export default function Surface3D({
             className="h-2 w-24 rounded-full"
             style={{
               background:
-                "linear-gradient(90deg,#DC2626,#D97706 38%,#2D6A4F 72%,#1B4D3E)",
+                "linear-gradient(90deg,#DC2626,#D97706 38%,#689149 72%,#222D67)",
             }}
           />
           <span>Vigor</span>
