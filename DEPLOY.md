@@ -30,6 +30,8 @@ Variables de entorno (ya declaradas en `render.yaml`, ajustables en el panel):
 | `CUBY_CORS_ORIGINS` | `*` | Restringí al dominio de Vercel en producción. |
 | `CUBY_DEFAULT_YEARS` | `3` | Años de histórico para el score. |
 | `CUBY_LIVE` | `1` | `1` habilita /analyze; `0` lo apaga (mantenimiento). |
+| `GEMINI_API_KEY` | _(vacío)_ | Key de Google Gemini para el asistente "Pregúntale a Cuby". Sin ella, el chat responde que no está configurado. La key vive solo en el servidor. |
+| `GEMINI_MODEL` | `gemini-2.5-flash` | Modelo de Gemini a usar. |
 
 > El plan `starter` mantiene el motor caliente. El free tier se duerme y la
 > primera recopilación tras el reposo puede tardar bastante más.

@@ -25,3 +25,8 @@ CORS_ORIGINS = os.environ.get("CUBY_CORS_ORIGINS", "*").split(",")
 # Si es "1", /analyze intenta procesar en vivo contra Sentinel-2. Si es "0"
 # (o faltan las dependencias pesadas), la API sirve solo datos de demo.
 LIVE_ENABLED = os.environ.get("CUBY_LIVE", "1") == "1"
+
+# Asistente IA (Gemini). La API key la pone el operador por variable de entorno;
+# nunca viaja al navegador. Sin key, /chat responde que no está configurado.
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+GEMINI_MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")

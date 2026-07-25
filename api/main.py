@@ -13,6 +13,8 @@ from __future__ import annotations
 
 import json
 import logging
+import urllib.error
+import urllib.request
 from datetime import date, timedelta
 from functools import lru_cache
 from typing import Any
@@ -25,6 +27,8 @@ from .settings import (
     CACHE_ROOT,
     CORS_ORIGINS,
     DEFAULT_YEARS,
+    GEMINI_API_KEY,
+    GEMINI_MODEL,
     LIVE_ENABLED,
     PARCELS_DIR,
     RESOLUTION,
@@ -182,3 +186,100 @@ def analyze(req: AnalyzeRequest) -> dict:
         raise HTTPException(
             status_code=502, detail=f"No se pudo analizar el cubo: {exc}"
         ) from exc
+
+
+# ─────────────────────────── Asistente IA (Gemini) ───────────────────────────
+
+SYSTEM_PROMPT = (
+    "Sos Cuby, un asistente de inteligencia agrícola satelital. Explicás, en "
+    "español claro y conciso, los resultados de un análisis de parcela hecho con "
+    "imágenes Sentinel-2: el Score de Riesgo Verde (aptitud de la tierra como "
+    "garantía de un crédito de siembra, de 0 a 100), la verificación del cultivo, "
+    "y las alertas tempranas de estrés (NDVI biomasa, NDMI humedad, NDRE "
+    "clorofila). Hablás tanto para un agricultor como para un analista de crédito. "
+    "Usá SOLO la información del contexto entregado; si algo no está, decilo con "
+    "honestidad en vez de inventarlo. No repitas todo el contexto: respondé la "
+    "pregunta. Evitá tecnicismos innecesarios y andá al grano."
+)
+
+
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="'user' o 'assistant'")
+    content: str
+
+
+class ChatRequest(BaseModel):
+    context: str = Field("", description="Resumen del reporte analizado")
+    messages: list[ChatMessage] = Field(default_factory=list)
+
+
+def _gemini(system_text: str, messages: list[ChatMessage]) -> str:
+    contents = [
+        {
+            "role": "user" if m.role == "user" else "model",
+            "parts": [{"text": m.content}],
+        }
+        for m in messages
+        if m.content.strip()
+    ]
+    body = {
+        "systemInstruction": {"parts": [{"text": system_text}]},
+        "contents": contents,
+        "generationConfig": {"temperature": 0.4, "maxOutputTokens": 900},
+    }
+    url = (
+        f"https://generativelanguage.googleapis.com/v1beta/models/"
+        f"{GEMINI_MODEL}:generateContent?key={GEMINI_API_KEY}"
+    )
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(body).encode("utf-8"),
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=45) as resp:
+        out = json.loads(resp.read().decode("utf-8"))
+
+    candidates = out.get("candidates") or []
+    if not candidates:
+        # Puede venir vacío por filtros de seguridad o prompt bloqueado.
+        return "No pude generar una respuesta para eso. Probá reformular la pregunta."
+    parts = candidates[0].get("content", {}).get("parts", [])
+    text = "".join(p.get("text", "") for p in parts).strip()
+    return text or "No pude generar una respuesta para eso."
+
+
+@app.post("/chat")
+def chat(req: ChatRequest) -> dict:
+    """Pregúntale a Cuby: resume el análisis y responde preguntas vía Gemini.
+
+    La API key vive en el servidor (GEMINI_API_KEY); nunca viaja al navegador.
+    """
+    if not GEMINI_API_KEY:
+        return {
+            "ok": False,
+            "reply": "El asistente todavía no está configurado en el servidor "
+            "(falta la API key de Gemini). Pedile al administrador que defina "
+            "GEMINI_API_KEY.",
+        }
+    if not req.messages:
+        return {"ok": False, "reply": "No recibí ninguna pregunta."}
+
+    system_text = SYSTEM_PROMPT
+    if req.context.strip():
+        system_text += "\n\n=== CONTEXTO DEL ANÁLISIS ACTUAL ===\n" + req.context.strip()
+
+    try:
+        return {"ok": True, "reply": _gemini(system_text, req.messages)}
+    except urllib.error.HTTPError as exc:  # noqa: PERF203
+        detail = exc.read().decode("utf-8", "ignore")[:300]
+        log.error("Gemini HTTP %s: %s", exc.code, detail)
+        msg = "No pude responder ahora (error del modelo)."
+        if exc.code in (400, 403):
+            msg = "La API key de Gemini parece inválida o sin permisos."
+        elif exc.code == 429:
+            msg = "El asistente está saturado (límite de cuota). Probá en un momento."
+        return {"ok": False, "reply": msg}
+    except Exception as exc:  # noqa: BLE001
+        log.exception("Fallo el chat")
+        return {"ok": False, "reply": "No pude conectar con el asistente."}
