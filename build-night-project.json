@@ -1,5 +1,5 @@
 {
-  "project-name": "<FILL THIS>",
-  "project-oneliner": "<FILL THIS>",
-  "project-description": "<FILL THIS>"
+  "project-name": "Cuby",
+  "project-oneliner": "Score de Riesgo Verde para créditos agrícolas y alertas tempranas de estrés en el cultivo, con Sentinel-2.",
+  "project-description": "Cuby convierte cualquier parcela agrícola en inteligencia accionable a partir de imágenes satelitales Sentinel-2. Para bancos y financieras calcula un Score de Riesgo Verde (0–100) que evalúa productividad, estabilidad y cobertura del lote como garantía de un crédito de siembra, reduciendo visitas de perito. Para agricultores genera alertas tempranas de estrés hídrico y plagas comparando NDVI, NDMI y NDRE en cada pasada del satélite (~5 días), antes de que el daño sea visible a ojo. Incluye frontend Next.js, API FastAPI y pipeline de ingesta geoespacial con caché local."
 }
